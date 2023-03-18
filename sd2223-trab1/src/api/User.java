@@ -1,4 +1,4 @@
-package sd2223.trab1.api;
+package api;
 /**
  * Represents a user in the system. Note: the password of a user should not be
  * returned in any method.
@@ -53,6 +53,10 @@ public class User {
 
 	public void setDomain(String domain) {
 		this.domain = domain;
+	}
+
+	public String getIdentifier() {
+		return String.format("%s@%s", getName(), getDomain());
 	}
 
 	@Override

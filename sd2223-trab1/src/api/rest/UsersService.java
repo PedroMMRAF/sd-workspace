@@ -1,4 +1,4 @@
-package sd2223.trab1.api.rest;
+package api.rest;
 
 import java.util.List;
 
@@ -12,7 +12,8 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-import sd2223.trab1.api.User;
+
+import api.User;
 
 @Path(UsersService.PATH)
 public interface UsersService {
@@ -38,7 +39,7 @@ public interface UsersService {
 	 * Obtains the information on the user identified by name
 	 * @param name the name of the user
 	 * @param pwd password of the user
-	 * @return 200 and the user object, if the userId exists and password matches the
+	 * @return 200 and the user object, if the userName exists and password matches the
 	 *         existing password; 
 	 *         403 if the password is incorrect; 
 	 *         404 if no user exists with the provided userId
