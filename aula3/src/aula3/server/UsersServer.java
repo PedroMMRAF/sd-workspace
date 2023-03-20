@@ -10,33 +10,32 @@ import org.glassfish.jersey.server.ResourceConfig;
 import aula3.server.resources.UsersResource;
 
 public class UsersServer {
+    private static Logger Log = Logger.getLogger(UsersServer.class.getName());
 
-	private static Logger Log = Logger.getLogger(UsersServer.class.getName());
+    static {
+        System.setProperty("java.net.preferIPv4Stack", "true");
+    }
 
-	static {
-		System.setProperty("java.net.preferIPv4Stack", "true");
-	}
+    public static final int PORT = 8080;
+    public static final String SERVICE = "UsersService";
+    private static final String SERVER_URI_FMT = "http://%s:%s/rest";
 
-	public static final int PORT = 8080;
-	public static final String SERVICE = "UsersService";
-	private static final String SERVER_URI_FMT = "http://%s:%s/rest";
+    public static void main(String[] args) {
+        try {
+            ResourceConfig config = new ResourceConfig();
+            config.register(UsersResource.class);
+            // config.register(CustomLoggingFilter.class);
 
-	public static void main(String[] args) {
-		try {
+            String ip = InetAddress.getLocalHost().getHostAddress();
+            String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
+            JdkHttpServerFactory.createHttpServer(URI.create(serverURI), config);
 
-			ResourceConfig config = new ResourceConfig();
-			config.register(UsersResource.class);
-			// config.register(CustomLoggingFilter.class);
+            Log.info(String.format("%s Server ready @ %s\n", SERVICE, serverURI));
 
-			String ip = InetAddress.getLocalHost().getHostAddress();
-			String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
-			JdkHttpServerFactory.createHttpServer(URI.create(serverURI), config);
-
-			Log.info(String.format("%s Server ready @ %s\n", SERVICE, serverURI));
-
-			// More code can be executed here...
-		} catch (Exception e) {
-			Log.severe(e.getMessage());
-		}
-	}
+            // More code can be executed here...
+        }
+        catch (Exception e) {
+            Log.severe(e.getMessage());
+        }
+    }
 }

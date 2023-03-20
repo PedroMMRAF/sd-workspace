@@ -34,19 +34,22 @@ public class RestClient {
 		this.client = ClientBuilder.newClient(config);
 	}
 
-	protected <T> T reTry(Supplier<T> func) {
-		for (int i = 0; i < MAX_RETRIES; i++)
+	protected <T> T retry(Supplier<T> func) {
+		for (int i = 0; i < MAX_RETRIES; i++) {
 			try {
 				return func.get();
-			} catch (ProcessingException x) {
-				System.err.println( x.getMessage() );
+			}
+			catch (ProcessingException x) {
+				System.err.println(x.getMessage());
 				Log.fine("ProcessingException: " + x.getMessage());
 				sleep(RETRY_SLEEP);
-			} catch (Exception x) {
+			}
+			catch (Exception x) {
 				Log.fine("Exception: " + x.getMessage());
 				x.printStackTrace();
 				break;
 			}
+		}
 		return null;
 	}
 
