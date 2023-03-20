@@ -1,0 +1,31 @@
+feeds
+docker run -it -h feeds.nova --name feeds.nova --network sdnet sd2223-trab1-xxxxx-yyyyy /bin/bash
+java -cp ./sd2223.jar "sd2223.trab1.server.FeedsServer" nova
+
+users 
+docker run -it -h users.nova --name users.nova --network sdnet sd2223-trab1-xxxxx-yyyyy /bin/bash
+java -cp ./sd2223.jar "sd2223.trab1.server.UsersServer" nova
+
+
+create user 
+docker run -it --network sdnet sd2223-trab1-xxxxx-yyyyy /bin/bash
+java -cp sd2223.jar sd2223.trab1.clients.CreateUserClient nmp 12345 nova "Nuno Preguica"
+
+create message 
+docker run -it --network sdnet sd2223-trab1-xxxxx-yyyyy /bin/bash
+java -cp sd2223.jar sd2223.trab1.clients.CreateMessageClient nmp@nova 12345 1 nova "teste mensagens"
+
+get user
+docker run -it --network sdnet sd2223-trab1-xxxxx-yyyyy /bin/bash
+java -cp sd2223.jar sd2223.trab1.clients.GetUserClient nova nmp 12345
+
+get Message
+docker run -it --network sdnet sd2223-trab1-xxxxx-yyyyy /bin/bash
+java -cp sd2223.jar sd2223.trab1.clients.GetMessageClient nmp@nova 1
+
+
+Test ddicovery
+docker run -it --network sdnet sd2223-trab1-xxxxx-yyyyy /bin/bash
+java -cp ./sd2223.jar "sd2223.trab1.clients.TestDiscovery" nova
+
+
