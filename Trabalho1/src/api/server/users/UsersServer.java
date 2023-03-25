@@ -32,10 +32,9 @@ public class UsersServer {
 
             Log.info(String.format("%s Server ready @ %s\n", SERVICE, serverURI));
 
-            //More code can be executed here...
-            Discovery.getInstance().announce(SERVICE, serverURI);
-        }
-        catch (Exception e) {
+            // More code can be executed here...
+            Discovery.getInstance().announce(args[0].split(".")[1], SERVICE, serverURI);
+        } catch (Exception e) {
             Log.severe(e.getMessage());
         }
     }

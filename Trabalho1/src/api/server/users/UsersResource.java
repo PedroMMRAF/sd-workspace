@@ -17,9 +17,10 @@ public class UsersResource implements UsersService {
 
     private static Logger Log = Logger.getLogger(UsersResource.class.getName());
 
-    private final Map<String, User> users = new HashMap<>();
+    private final Map<String, User> users;
 
     public UsersResource() {
+        users = new HashMap<>();
     }
 
     @Override
@@ -34,11 +35,10 @@ public class UsersResource implements UsersService {
             throw new WebApplicationException(Status.CONFLICT);
         }
 
-        users.put(user.getName(), user);
+        users.put(user.getIdentifier(), user);
 
         return user.getIdentifier();
     }
-
 
     @Override
     public User getUser(String userName, String password) {
@@ -57,7 +57,6 @@ public class UsersResource implements UsersService {
         return user;
     }
 
-
     @Override
     public User updateUser(String userName, String password, User newUser) {
         Log.info("updateUser : user = " + userName + "; pwd = " + password + " ; user = " + newUser);
@@ -74,7 +73,6 @@ public class UsersResource implements UsersService {
         return user;
     }
 
-
     @Override
     public User deleteUser(String userName, String password) {
         Log.info("deleteUser : user = " + userName + "; pwd = " + password);
@@ -83,7 +81,6 @@ public class UsersResource implements UsersService {
 
         return users.remove(userName);
     }
-
 
     @Override
     public List<User> searchUsers(String pattern) {
@@ -101,8 +98,7 @@ public class UsersResource implements UsersService {
                         user.getName(),
                         "",
                         user.getDomain(),
-                        user.getDisplayName()
-                ));
+                        user.getDisplayName()));
             }
         }
 

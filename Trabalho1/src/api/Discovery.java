@@ -10,27 +10,31 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * <p>A class interface to perform service discovery based on periodic
- * announcements over multicast communication.</p>
+ * <p>
+ * A class interface to perform service discovery based on periodic
+ * announcements over multicast communication.
+ * </p>
  */
 public interface Discovery {
 
     /**
      * Used to announce the URI of the given service name.
      *
+     * @param domain      - the name of the domain
      * @param serviceName - the name of the service
      * @param serviceURI  - the uri of the service
      */
-    void announce(String serviceName, String serviceURI);
+    void announce(String domain, String serviceName, String serviceURI);
 
     /**
      * Get discovered URIs for a given service name
      *
      * @param serviceName - name of the service
-     * @param minReplies  - minimum number of requested URIs. Blocks until the number is satisfied.
+     * @param minReplies  - minimum number of requested URIs. Blocks until the
+     *                    number is satisfied.
      * @return array with the discovered URIs for the given service name.
      */
-    URI[] knownUrisOf(String serviceName, int minReplies) throws InterruptedException;
+    URI[] knownUrisOf(String serviceName, int minReplies);
 
     /**
      * Get the instance of the Discovery service
@@ -78,11 +82,11 @@ class DiscoveryImpl implements Discovery {
     private final Map<String, Cache<String, URI>> discovered;
 
     @Override
-    public void announce(String serviceName, String serviceURI) {
+    public void announce(String domain, String serviceName, String serviceURI) {
         Log.info(String.format("Starting Discovery announcements on: %s for: %s -> %s\n",
                 DISCOVERY_ADDR, serviceName, serviceURI));
 
-        var pktBytes = String.format("%s%s%s", serviceName, DELIMITER, serviceURI).getBytes();
+        var pktBytes = String.format("%s:%s%s%s", domain, serviceName, DELIMITER, serviceURI).getBytes();
         var pkt = new DatagramPacket(pktBytes, pktBytes.length, DISCOVERY_ADDR);
 
         // start thread to send periodic announcements
@@ -92,25 +96,28 @@ class DiscoveryImpl implements Discovery {
                     try {
                         ds.send(pkt);
                         Thread.sleep(DISCOVERY_ANNOUNCE_PERIOD);
-                    }
-                    catch (InterruptedException | IOException e) {
+                    } catch (InterruptedException | IOException e) {
                         e.printStackTrace();
                     }
                 }
-            }
-            catch (SocketException e) {
+            } catch (SocketException e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
     @Override
-    public URI[] knownUrisOf(String serviceName, int minEntries) throws InterruptedException {
+    public URI[] knownUrisOf(String serviceName, int minEntries) {
         var cache = discovered.get(serviceName);
 
-        while (cache == null || cache.size() < minEntries) {
-            Thread.sleep(DISCOVERY_RETRY_TIMEOUT);
-            cache = discovered.get(serviceName);
+        try {
+            while (cache == null || cache.size() < minEntries) {
+                Thread.sleep(DISCOVERY_RETRY_TIMEOUT);
+                cache = discovered.get(serviceName);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
 
         return cache.asMap().values().toArray(URI[]::new);
@@ -143,13 +150,11 @@ class DiscoveryImpl implements Discovery {
                             var cache = discovered.get(serviceName);
                             cache.put(parts[1], uri);
                         }
-                    }
-                    catch (IOException x) {
+                    } catch (IOException x) {
                         x.printStackTrace();
                     }
                 }
-            }
-            catch (IOException x) {
+            } catch (IOException x) {
                 x.printStackTrace();
             }
         }).start();
