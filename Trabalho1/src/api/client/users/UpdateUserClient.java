@@ -12,11 +12,7 @@ import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
 public class UpdateUserClient {
-
-    private static WebTarget response;
-
     public static void main(String[] args) throws InterruptedException {
-
         if (args.length != 6) {
             System.err.println(
                     "Use: java trab1.client.users.UpdateUserClient service userName oldPwd newPwd domain displayName");
@@ -50,11 +46,9 @@ public class UpdateUserClient {
         if (response.getStatus() == Response.Status.OK.getStatusCode() && response.hasEntity()) {
             System.out.printf("Success! Updated user with id: %s\n",
                     response.readEntity(String.class));
-        }
-        else {
+        } else {
             System.out.printf("Error, HTTP error status: %s\n",
                     Response.Status.fromStatusCode(response.getStatus()));
         }
     }
-
 }

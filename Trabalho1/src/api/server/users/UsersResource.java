@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 @Singleton
@@ -105,4 +106,13 @@ public class UsersResource implements UsersService {
         return matched;
     }
 
+    @Override
+    public List<User> getUsers(Set<String> users) {
+        Log.info("getUsers : users = " + String.join(", ", users));
+
+        if (users == null)
+            throw new WebApplicationException(Status.BAD_REQUEST);
+
+        return this.users.values().stream().filter((user) -> users.contains(user.getName())).toList();
+    }
 }

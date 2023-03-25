@@ -12,8 +12,6 @@ import jakarta.ws.rs.core.Response.Status;
 import org.glassfish.jersey.client.ClientConfig;
 
 public class GetUserClient {
-
-
     public static void main(String[] args) throws InterruptedException {
 
         if (args.length != 3) {
@@ -42,8 +40,7 @@ public class GetUserClient {
             System.out.println("Success:");
             User user = r.readEntity(User.class);
             System.out.printf("User: %s\n", user);
-        }
-        else
+        } else
             System.out.printf("Error, HTTP error status: %s\n", r.getStatus());
 
     }
