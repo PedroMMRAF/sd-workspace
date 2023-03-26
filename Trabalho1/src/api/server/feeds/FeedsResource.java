@@ -1,6 +1,5 @@
 package api.server.feeds;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -88,7 +87,6 @@ public class FeedsResource implements FeedsService {
 
     @Override
     public long postMessage(String user, String pwd, Message msg) {
-        // TODO: send messages to folowers of user
         if (msg == null)
             throw new WebApplicationException(Status.BAD_REQUEST);
 
@@ -101,6 +99,10 @@ public class FeedsResource implements FeedsService {
         msg.setId(id);
 
         allMessages.put(id, msg);
+        for (String u : followers.get(user)) {
+            Map<Long, Message> userFeed=feeds.get(u);
+            userFeed.put(id, msg);
+        }
         feeds.get(user).put(id, msg);
 
         return id;
@@ -125,9 +127,13 @@ public class FeedsResource implements FeedsService {
             throw new WebApplicationException(Status.BAD_REQUEST);
 
         Map<Long, Message> feed = feeds.get(user);
-        Message msg = allMessages.get(msgId);
 
-        if (feed == null || msg == null)
+        if (feed == null)
+            throw new WebApplicationException(Status.NOT_FOUND);
+
+        Message msg = feed.get(msgId);
+
+        if (msg == null)
             throw new WebApplicationException(Status.NOT_FOUND);
 
         return msg;
