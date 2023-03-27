@@ -1,7 +1,7 @@
-package api.server.users;
+package trab1.server.users;
 
-import api.User;
-import api.rest.UsersService;
+import trab1.User;
+import trab1.rest.UsersService;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;

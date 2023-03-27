@@ -1,10 +1,9 @@
-package api;
+package trab1;
 
 /**
  * Represents a message in the system.
  */
 public class Message {
-
 	private long id;
 	private String user;
 	private String domain;

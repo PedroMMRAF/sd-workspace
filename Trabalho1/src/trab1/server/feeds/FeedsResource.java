@@ -1,20 +1,21 @@
-package api.server.feeds;
+package trab1.server.feeds;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.glassfish.jersey.client.ClientConfig;
 
-import api.User;
-import api.Message;
-import api.Discovery;
-import api.rest.FeedsService;
-import api.rest.UsersService;
-import api.server.users.UsersServer;
+import trab1.User;
+import trab1.Message;
+import trab1.Discovery;
+import trab1.rest.FeedsService;
+import trab1.rest.UsersService;
+import trab1.server.users.UsersServer;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.WebTarget;
@@ -94,13 +95,13 @@ public class FeedsResource implements FeedsService {
 
         feeds.putIfAbsent(user, new HashMap<>());
 
-        long id = allMessages.size();
+        long id = UUID.randomUUID().getMostSignificantBits();
 
         msg.setId(id);
 
         allMessages.put(id, msg);
         for (String u : followers.get(user)) {
-            Map<Long, Message> userFeed=feeds.get(u);
+            Map<Long, Message> userFeed = feeds.get(u);
             userFeed.put(id, msg);
         }
         feeds.get(user).put(id, msg);

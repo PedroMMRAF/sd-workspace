@@ -1,6 +1,6 @@
-package api.server.feeds;
+package trab1.server.feeds;
 
-import api.Discovery;
+import trab1.Discovery;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;

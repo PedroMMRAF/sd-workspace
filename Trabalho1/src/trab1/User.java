@@ -1,4 +1,5 @@
-package api;
+package trab1;
+
 /**
  * Represents a user in the system. Note: the password of a user should not be
  * returned in any method.

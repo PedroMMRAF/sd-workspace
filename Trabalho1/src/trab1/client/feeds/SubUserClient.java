@@ -1,7 +1,7 @@
-package api.client.feeds;
+package trab1.client.feeds;
 
-import api.Discovery;
-import api.rest.FeedsService;
+import trab1.Discovery;
+import trab1.rest.FeedsService;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
@@ -12,10 +12,8 @@ import jakarta.ws.rs.core.Response.Status;
 import org.glassfish.jersey.client.ClientConfig;
 
 public class SubUserClient {
-
     public static void main(String[] args) throws InterruptedException {
-
-        if (args.length != 5) {
+        if (args.length != 3) {
             System.err.println(
                     "Use: java trab1.client.users.CreateUserClient user userSub pwd");
             return;
@@ -36,15 +34,15 @@ public class SubUserClient {
 
         WebTarget target = client.target(serverUrl).path(FeedsService.PATH);
 
-        Response response = target.path("/sub/" + userInfo[0] + "/" + userSubInfo[0]).queryParam(FeedsService.PWD, pwd)
-                .request().accept(MediaType.APPLICATION_JSON).post(Entity.entity(null, MediaType.APPLICATION_JSON));
+        Response response = target.path("sub").path(userInfo[0]).path(userSubInfo[0])
+                .queryParam(FeedsService.PWD, pwd).request()
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(null, MediaType.APPLICATION_JSON));
 
         if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
             System.out.printf("Success, created user with id: %s\n",
                     response.readEntity(String.class));
         else
             System.out.printf("Error, HTTP error status: %s\n", response.getStatus());
-
     }
-
 }

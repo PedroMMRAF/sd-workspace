@@ -1,4 +1,4 @@
-package api;
+package trab1;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -16,7 +16,6 @@ import java.util.logging.Logger;
  * </p>
  */
 public interface Discovery {
-
     /**
      * Used to announce the URI of the given service name.
      *
