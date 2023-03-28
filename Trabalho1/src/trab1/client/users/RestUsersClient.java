@@ -83,7 +83,7 @@ public class RestUsersClient extends RestClient implements UsersService {
                 .get();
 
         if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity())
-            return r.readEntity(new GenericType<List<User>>() {
+            return r.readEntity(new GenericType<>() {
             });
 
         printErrorStatus(r.getStatus());
