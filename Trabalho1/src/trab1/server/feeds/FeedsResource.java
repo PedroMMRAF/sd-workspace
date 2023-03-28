@@ -24,7 +24,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.client.ClientBuilder;
 
-
 public class FeedsResource implements FeedsService {
     private static Logger Log = Logger.getLogger(FeedsResource.class.getName());
 
@@ -42,7 +41,7 @@ public class FeedsResource implements FeedsService {
     }
 
     private User getUser(String user, String pwd) {
-        String serverUrl = Discovery.getInstance().knownUrisOf(UsersServer.SERVICE, 1)[0].toString();
+        String serverUrl = Discovery.getInstance().knownUrisOf(UsersServer.SERVICE_FMT, 1)[0].toString();
 
         Log.info("Requesting user info...");
 
