@@ -1,49 +1,22 @@
 package trab1.client.feeds;
 
-import trab1.Discovery;
-import trab1.rest.FeedsService;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-import org.glassfish.jersey.client.ClientConfig;
-
 public class UnsubscribeUserClient {
     public static void main(String[] args) throws InterruptedException {
 
-        if (args.length != 3) {
+        if (args.length != 4) {
             System.err.println(
                     "Use: java trab1.client.users.CreateUserClient user userSub pwd");
             return;
         }
 
-        String user = args[0];
-        String userSub = args[1];
-        String pwd = args[2];
-        String[] userInfo = user.split("@");
-        String[] userSubInfo = userSub.split("@");
-
-        String serverUrl = Discovery.getInstance().knownUrisOf("service", 1)[0].toString();
+        String domain = args[0];
+        String user = args[1];
+        String userSub = args[2];
+        String pwd = args[3];
 
         System.out.println("Sending request to server.");
 
-        ClientConfig config = new ClientConfig();
-        Client client = ClientBuilder.newClient(config);
-
-        WebTarget target = client.target(serverUrl).path(FeedsService.PATH);
-
-        Response response = target.path("sub").path(userInfo[0]).path(userSubInfo[0])
-                .queryParam(FeedsService.PWD, pwd)
-                .request().accept(MediaType.APPLICATION_JSON).delete();
-
-        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
-            System.out.printf("Success, created user with id: %s\n",
-                    response.readEntity(String.class));
-        else
-            System.out.printf("Error, HTTP error status: %s\n", response.getStatus());
-
+        new RestFeedsClient(domain).unsubscribeUser(user, userSub, pwd);
     }
 
 }

@@ -1,29 +1,24 @@
 package trab1.client.feeds;
 
 import trab1.Message;
-import trab1.Discovery;
-
-import java.net.URI;
 
 public class PostMessageClient {
     public static void main(String[] args) throws InterruptedException {
-        if (args.length != 3) {
+        if (args.length != 4) {
             System.err.println(
-                    "Use: java trab1.client.users.CreateUserClient user pwd text");
+                    "Use: java trab1.client.users.CreateUserClient domain user pwd text");
             return;
         }
 
-        String user = args[0];
-        String pwd = args[1];
-        String text = args[2];
-        String[] userInfo = user.split("@");
+        String domain=args[0];
+        String user = args[1];
+        String pwd = args[2];
+        String text = args[3];
 
-        String serverUrl = Discovery.getInstance().knownUrisOf("service", 1)[0].toString();
-
-        Message msg = new Message(-1, userInfo[0], userInfo[1], text);
+        Message msg = new Message(-1, user, domain, text);
 
         System.out.println("Sending request to server.");
 
-        new RestFeedsClient(URI.create(serverUrl)).postMessage(user, pwd, msg);
+        new RestFeedsClient(domain).postMessage(user, pwd, msg);
     }
 }

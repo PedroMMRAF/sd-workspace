@@ -6,18 +6,19 @@ import trab1.rest.FeedsService;
 import trab1.rest.UsersService;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-import java.net.URI;
 import java.util.List;
 
 public class RestFeedsClient extends RestClient implements FeedsService {
+    private static final String SERVICE_FMT = "%s:feeds";
     private final WebTarget target;
 
-    public RestFeedsClient(URI serverURI) {
-        super(serverURI);
+    public RestFeedsClient(String domain) {
+        super(String.format(SERVICE_FMT, domain));
         this.target = client.target(serverURI).path(UsersService.PATH);
     }
 
@@ -50,37 +51,64 @@ public class RestFeedsClient extends RestClient implements FeedsService {
     }
 
     public Message clt_getMessage(String user, long mid) {
-        Response r = target.request().get();
+        Response response = target.path(user).path(Long.toString(mid))
+                .request().accept(MediaType.APPLICATION_JSON).get();
 
-        printErrorStatus(r.getStatus());
+        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
+            return response.readEntity(Message.class);
+
+        printErrorStatus(response.getStatus());
         return null;
     }
 
     public List<Message> clt_getMessages(String user, long time) {
-        Response r = target.request().get();
+        Response response = target.path(user)
+                .queryParam(FeedsService.TIME, time).request()
+                .accept(MediaType.APPLICATION_JSON).get();
 
-        printErrorStatus(r.getStatus());
+        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
+            return response.readEntity(new GenericType<>() {
+            });
+
+        printErrorStatus(response.getStatus());
         return null;
     }
 
     public int clt_subUser(String user, String userSub, String pwd) {
-        Response r = target.request().get();
+        Response response = target.path("sub").path(user).path(userSub)
+                .queryParam(FeedsService.PWD, pwd).request()
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(null, MediaType.APPLICATION_JSON));
 
-        printErrorStatus(r.getStatus());
+        if (response.getStatus() == Status.NO_CONTENT.getStatusCode())
+            return 0;
+
+        printErrorStatus(response.getStatus());
         return 0;
     }
 
     public int clt_unsubscribeUser(String user, String userSub, String pwd) {
-        Response r = target.request().get();
+        Response response = target.path("sub").path(user).path(userSub)
+                .queryParam(FeedsService.PWD, pwd)
+                .request().accept(MediaType.APPLICATION_JSON).delete();
 
-        printErrorStatus(r.getStatus());
+        if (response.getStatus() == Status.NO_CONTENT.getStatusCode())
+            return 0;
+
+        printErrorStatus(response.getStatus());
         return 0;
     }
 
     public List<String> clt_listSubs(String user) {
-        Response r = target.request().get();
+        Response response = target.path("sub").path("list").path(user)
+                .request().accept(MediaType.APPLICATION_JSON)
+                .delete();
 
-        printErrorStatus(r.getStatus());
+        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
+            return response.readEntity(new GenericType<>() {
+            });
+
+        printErrorStatus(response.getStatus());
         return null;
     }
 
