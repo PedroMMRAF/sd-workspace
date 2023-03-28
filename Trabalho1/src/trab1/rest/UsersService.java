@@ -1,7 +1,6 @@
 package trab1.rest;
 
 import java.util.List;
-import java.util.Set;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -23,7 +22,6 @@ public interface UsersService {
     String NAME = "name";
     String QUERY = "query";
     String PATH = "/users";
-    String GET = "/get";
 
     /**
      * Creates a new user in the local domain.
@@ -104,16 +102,4 @@ public interface UsersService {
     @Produces(MediaType.APPLICATION_JSON)
     List<User> searchUsers(@QueryParam(QUERY) String pattern);
 
-    /**
-     * Returns the list of users with the given names
-     * 
-     * @param users List of users to get information for
-     * @return 200 when the search was successful, regardless of the number of hits
-     *         (including 0 hits). 400 otherwise.
-     */
-    @POST
-    @Path(GET)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    List<User> getUsers(Set<String> users);
 }

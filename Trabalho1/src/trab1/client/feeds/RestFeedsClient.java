@@ -1,7 +1,6 @@
 package trab1.client.feeds;
 
 import trab1.Message;
-import trab1.User;
 import trab1.client.RestClient;
 import trab1.rest.FeedsService;
 import trab1.rest.UsersService;
@@ -78,7 +77,7 @@ public class RestFeedsClient extends RestClient implements FeedsService {
         return 0;
     }
 
-    public List<User> clt_listSubs(String user) {
+    public List<String> clt_listSubs(String user) {
         Response r = target.request().get();
 
         printErrorStatus(r.getStatus());
@@ -122,7 +121,7 @@ public class RestFeedsClient extends RestClient implements FeedsService {
     }
 
     @Override
-    public List<User> listSubs(String user) {
+    public List<String> listSubs(String user) {
         return super.retry(() -> clt_listSubs(user));
     }
 

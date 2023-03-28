@@ -20,7 +20,7 @@ public class GetMessageClient {
 
         String user = args[0];
         String msgId = args[1];
-        String[] userInfo = user.split("@");
+
 
         String serverUrl = Discovery.getInstance().knownUrisOf("service", 1)[0].toString();
 
@@ -31,7 +31,7 @@ public class GetMessageClient {
 
         WebTarget target = client.target(serverUrl).path(FeedsService.PATH);
 
-        Response response = target.path(userInfo[0]).path(msgId)
+        Response response = target.path(user).path(msgId)
                 .request().accept(MediaType.APPLICATION_JSON).get();
 
         if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())

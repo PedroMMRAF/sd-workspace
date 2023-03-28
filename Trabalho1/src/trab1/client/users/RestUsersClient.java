@@ -12,7 +12,7 @@ import jakarta.ws.rs.core.Response.Status;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Set;
+
 
 public class RestUsersClient extends RestClient implements UsersService {
     private final WebTarget target;
@@ -119,11 +119,6 @@ public class RestUsersClient extends RestClient implements UsersService {
     @Override
     public List<User> searchUsers(String pattern) {
         return super.retry(() -> clt_searchUsers(pattern));
-    }
-
-    @Override
-    public List<User> getUsers(Set<String> users) {
-        return null;
     }
 
     // #endregion

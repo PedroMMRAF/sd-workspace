@@ -13,7 +13,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
 import trab1.Message;
-import trab1.User;
+
 
 @Path(FeedsService.PATH)
 public interface FeedsService {
@@ -145,5 +145,5 @@ public interface FeedsService {
 	@GET
 	@Path("/sub/list/{" + USER + "}")
 	@Produces(MediaType.APPLICATION_JSON)
-	List<User> listSubs(@PathParam(USER) String user);
+	List<String> listSubs(@PathParam(USER) String user);
 }

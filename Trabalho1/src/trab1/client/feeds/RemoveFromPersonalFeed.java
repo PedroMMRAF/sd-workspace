@@ -15,7 +15,6 @@ public class RemoveFromPersonalFeed {
         String user = args[0];
         long mid = Long.parseLong(args[1]);
         String pwd = args[2];
-        String[] userInfo = user.split("@");
 
         String serverUrl = Discovery.getInstance().knownUrisOf("service", 1)[0].toString();
 

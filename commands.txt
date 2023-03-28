@@ -5,7 +5,7 @@ mvn clean compile assembly:single docker:build
 docker network create -d bridge sdnet
 
 # Run server
-docker run --rm -h <HOST-NAME> --name <NAME> --network sdnet -p 8080:8080 <PROJECT>
+docker run --rm -h <HOST-NAME> --name <NAME> --network sdnet -p 8080:8080 <PROJECT> <COMANDO>
 
 # Run client
 docker run --rm -it --name <NAME> --network sdnet <PROJECT> /bin/bash

@@ -19,12 +19,11 @@ import trab1.server.users.UsersServer;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
+
 
 public class FeedsResource implements FeedsService {
     private static Logger Log = Logger.getLogger(FeedsResource.class.getName());
@@ -62,28 +61,6 @@ public class FeedsResource implements FeedsService {
             return response.readEntity(User.class);
 
         throw new WebApplicationException(Status.FORBIDDEN);
-    }
-
-    private List<User> getUsers(Set<String> users) {
-        String serverUrl = Discovery.getInstance().knownUrisOf(UsersServer.SERVICE, 1)[0].toString();
-
-        System.out.println("Sending request to server.");
-
-        ClientConfig config = new ClientConfig();
-        Client client = ClientBuilder.newClient(config);
-
-        WebTarget target = client.target(serverUrl).path(UsersService.PATH);
-
-        Response response = target.path(UsersService.GET)
-                .request()
-                .accept(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(users, MediaType.APPLICATION_JSON));
-
-        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
-            return response.readEntity(new GenericType<List<User>>() {
-            });
-
-        throw new WebApplicationException(response.getStatus());
     }
 
     @Override
@@ -179,7 +156,7 @@ public class FeedsResource implements FeedsService {
     }
 
     @Override
-    public List<User> listSubs(String user) {
-        return getUsers(followers.get(user));
+    public List<String> listSubs(String user) {
+        return followers.get(user).stream().toList();
     }
 }
