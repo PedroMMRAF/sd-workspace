@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 public class UsersServer {
 
     public static final int PORT = 8080;
-    public static final String SERVICE = "UsersService";
+    public static final String SERVICE_FMT = "%s:users";
     private static final String SERVER_URI_FMT = "http://%s:%s/rest";
     private static final Logger Log = Logger.getLogger(UsersServer.class.getName());
 
@@ -29,11 +29,11 @@ public class UsersServer {
             String ip = InetAddress.getLocalHost().getHostAddress();
             String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
             JdkHttpServerFactory.createHttpServer(URI.create(serverURI), config);
+            String service = String.format(SERVICE_FMT, args[0]);
 
-            Log.info(String.format("%s Server ready @ %s\n", SERVICE, serverURI));
+            Log.info(String.format("%s Server ready @ %s\n", service, serverURI));
 
-            // More code can be executed here...
-            Discovery.getInstance().announce(args[0].split(".")[1], SERVICE, serverURI);
+            Discovery.getInstance().announce(service, serverURI);
         } catch (Exception e) {
             Log.severe(e.getMessage());
         }
