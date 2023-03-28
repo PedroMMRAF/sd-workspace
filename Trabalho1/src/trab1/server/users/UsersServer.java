@@ -1,6 +1,7 @@
 package trab1.server.users;
 
 import trab1.Discovery;
+import trab1.Domain;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -12,7 +13,7 @@ import java.util.logging.Logger;
 public class UsersServer {
 
     public static final int PORT = 8080;
-    public static final String SERVICE_FMT = "%s:users";
+    public static final String SERVICE = "users";
     private static final String SERVER_URI_FMT = "http://%s:%s/rest";
     private static final Logger Log = Logger.getLogger(UsersServer.class.getName());
 
@@ -23,17 +24,18 @@ public class UsersServer {
 
     public static void main(String[] args) {
         try {
+            Domain.set(args[0]);
+
             ResourceConfig config = new ResourceConfig();
             config.register(UsersResource.class);
 
             String ip = InetAddress.getLocalHost().getHostAddress();
             String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
             JdkHttpServerFactory.createHttpServer(URI.create(serverURI), config);
-            String service = String.format(SERVICE_FMT, args[0]);
 
-            Log.info(String.format("%s Server ready @ %s\n", service, serverURI));
+            Log.info(String.format("%s Server ready @ %s\n", SERVICE, serverURI));
 
-            Discovery.getInstance().announce(service, serverURI);
+            Discovery.getInstance().announce(Domain.get(), SERVICE, serverURI);
         } catch (Exception e) {
             Log.severe(e.getMessage());
         }

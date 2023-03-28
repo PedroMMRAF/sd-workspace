@@ -111,8 +111,26 @@ public interface FeedsService {
 	 */
 	@POST
 	@Path("/sub/{" + USER + "}/{" + USERSUB + "}")
-	@Produces(MediaType.APPLICATION_JSON)
 	void subUser(@PathParam(USER) String user, @PathParam(USERSUB) String userSub, @QueryParam(PWD) String pwd);
+
+	/**
+	 * Subscribe a user from another domain.
+	 * A user must contact the server of her domain directly (i.e., this operation
+	 * should not be
+	 * propagated to other domain)
+	 *
+	 * @param user    the user subscribing (following) other user (format
+	 *                user@domain)
+	 * @param userSub the user to be subscribed (followed) (format user@domain)
+	 * @return 204 if ok
+	 *         404 is generated if the user to be subscribed does not exist
+	 *         403 is generated if the user does not exist or if the pwd is not
+	 *         correct
+	 */
+	@POST
+	@Path("/sub/{" + USER + "}/{" + USERSUB + "}")
+	void subUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub,
+			@QueryParam(DOMAIN) String domain);
 
 	/**
 	 * UnSubscribe a user
@@ -131,7 +149,6 @@ public interface FeedsService {
 	 */
 	@DELETE
 	@Path("/sub/{" + USER + "}/{" + USERSUB + "}")
-	@Produces(MediaType.APPLICATION_JSON)
 	void unsubscribeUser(@PathParam(USER) String user, @PathParam(USERSUB) String userSub, @QueryParam(PWD) String pwd);
 
 	/**

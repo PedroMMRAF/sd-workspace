@@ -25,8 +25,8 @@ public class RestClient {
 	protected final Client client;
 	protected final ClientConfig config;
 
-	public RestClient(String service) {
-		String serverURL = Discovery.getInstance().knownUrisOf(service, 1)[0].toString();
+	public RestClient(String domain, String service) {
+		String serverURL = Discovery.getInstance().knownUrisOf(domain, service, 1)[0].toString();
 
 		this.serverURI = URI.create(serverURL);
 		this.config = new ClientConfig();

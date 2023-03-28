@@ -14,11 +14,11 @@ import jakarta.ws.rs.core.Response.Status;
 import java.util.List;
 
 public class RestFeedsClient extends RestClient implements FeedsService {
-    private static final String SERVICE_FMT = "%s:feeds";
+    private static final String SERVICE = "feeds";
     private final WebTarget target;
 
     public RestFeedsClient(String domain) {
-        super(String.format(SERVICE_FMT, domain));
+        super(domain, SERVICE);
         this.target = client.target(serverURI).path(UsersService.PATH);
     }
 
@@ -151,6 +151,10 @@ public class RestFeedsClient extends RestClient implements FeedsService {
     @Override
     public List<String> listSubs(String user) {
         return super.retry(() -> clt_listSubs(user));
+    }
+
+    @Override
+    public void subUserOtherDomain(String user, String userSub, String domain) {
     }
 
     // #endregion

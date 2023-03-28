@@ -13,12 +13,12 @@ import jakarta.ws.rs.core.Response.Status;
 import java.util.List;
 
 public class RestUsersClient extends RestClient implements UsersService {
-    private static final String SERVICE_FMT = "%s:users";
+    private static final String SERVICE = "users";
 
     private final WebTarget target;
 
     public RestUsersClient(String domain) {
-        super(String.format(SERVICE_FMT, domain));
+        super(domain, SERVICE);
         this.target = client.target(serverURI).path(UsersService.PATH);
     }
 

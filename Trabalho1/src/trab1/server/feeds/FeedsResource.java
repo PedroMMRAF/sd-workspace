@@ -1,5 +1,6 @@
 package trab1.server.feeds;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.glassfish.jersey.client.ClientConfig;
 import trab1.User;
 import trab1.Message;
 import trab1.Discovery;
+import trab1.Domain;
 import trab1.rest.FeedsService;
 import trab1.rest.UsersService;
 import trab1.server.users.UsersServer;
@@ -23,6 +25,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
 
 public class FeedsResource implements FeedsService {
     private static Logger Log = Logger.getLogger(FeedsResource.class.getName());
@@ -38,28 +41,6 @@ public class FeedsResource implements FeedsService {
 
         followers = new HashMap<>();
         following = new HashMap<>();
-    }
-
-    private User getUser(String user, String pwd) {
-        String serverUrl = Discovery.getInstance().knownUrisOf(UsersServer.SERVICE_FMT, 1)[0].toString();
-
-        Log.info("Requesting user info...");
-
-        ClientConfig config = new ClientConfig();
-        Client client = ClientBuilder.newClient(config);
-
-        WebTarget target = client.target(serverUrl).path(UsersService.PATH);
-
-        Response response = target.path(user)
-                .queryParam(UsersService.PWD, pwd)
-                .request()
-                .accept(MediaType.APPLICATION_JSON)
-                .get();
-
-        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
-            return response.readEntity(User.class);
-
-        throw new WebApplicationException(Status.FORBIDDEN);
     }
 
     @Override
@@ -130,6 +111,23 @@ public class FeedsResource implements FeedsService {
     public void subUser(String user, String userSub, String pwd) {
         getUser(user, pwd);
 
+        String subDomain = userSub.split("@")[1];
+
+        if (!subDomain.equals(Domain.get()))
+            subUserPropagate(user, userSub);
+
+        if (!feeds.containsKey(userSub))
+            throw new WebApplicationException(Status.NOT_FOUND);
+
+        following.putIfAbsent(user, new HashSet<>());
+        followers.putIfAbsent(userSub, new HashSet<>());
+
+        following.get(user).add(userSub);
+        followers.get(userSub).add(user);
+    }
+
+    @Override
+    public void subUserOtherDomain(String user, String userSub, String domain) {
         if (!feeds.containsKey(userSub))
             throw new WebApplicationException(Status.NOT_FOUND);
 
@@ -157,5 +155,53 @@ public class FeedsResource implements FeedsService {
     @Override
     public List<String> listSubs(String user) {
         return followers.get(user).stream().toList();
+    }
+
+    private User getUser(String user, String pwd) {
+        String[] userInfo = user.split("@");
+        String name = userInfo[0];
+        String domain = userInfo[1];
+
+        URI serverURI = Discovery.getInstance().knownUrisOf(domain, UsersServer.SERVICE, 1)[0];
+
+        Log.info("Requesting user info...");
+
+        ClientConfig config = new ClientConfig();
+        Client client = ClientBuilder.newClient(config);
+
+        WebTarget target = client.target(serverURI).path(UsersService.PATH);
+
+        Response response = target.path(name)
+                .queryParam(UsersService.PWD, pwd)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+
+        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
+            return response.readEntity(User.class);
+
+        throw new WebApplicationException(Status.FORBIDDEN);
+    }
+
+    private void subUserPropagate(String user, String userSub) {
+        URI serverURI = Discovery.getInstance().knownUrisOf(userSub.split("@")[1], FeedsServer.SERVICE, 1)[0];
+
+        Log.info("Sending user sub...");
+
+        ClientConfig config = new ClientConfig();
+        Client client = ClientBuilder.newClient(config);
+
+        WebTarget target = client.target(serverURI).path(FeedsService.PATH);
+
+        Response response = target.path("sub").path(user).path(userSub)
+                .queryParam(FeedsService.DOMAIN, user.split("@")[1])
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(null, MediaType.APPLICATION_JSON));
+
+        if (response.getStatus() == Status.NO_CONTENT.getStatusCode())
+            return;
+
+        throw new WebApplicationException(Status.FORBIDDEN);
     }
 }

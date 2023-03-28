@@ -23,17 +23,18 @@ public interface Discovery {
      * @param serviceName - the name of the service
      * @param serviceURI  - the uri of the service
      */
-    void announce(String serviceName, String serviceURI);
+    void announce(String domain, String serviceName, String serviceURI);
 
     /**
      * Get discovered URIs for a given service name
      *
+     * @param domain      - the name of the domain
      * @param serviceName - name of the service
      * @param minReplies  - minimum number of requested URIs. Blocks until the
      *                    number is satisfied.
      * @return array with the discovered URIs for the given service name.
      */
-    URI[] knownUrisOf(String serviceName, int minReplies);
+    URI[] knownUrisOf(String domain, String serviceName, int minReplies);
 
     /**
      * Get the instance of the Discovery service
@@ -80,12 +81,18 @@ class DiscoveryImpl implements Discovery {
 
     private final Map<String, Cache<String, URI>> discovered;
 
-    @Override
-    public void announce(String serviceName, String serviceURI) {
-        Log.info(String.format("Starting Discovery announcements on: %s for: %s -> %s\n",
-                DISCOVERY_ADDR, serviceName, serviceURI));
+    private String getService(String domain, String serviceName) {
+        return String.format("%s:%s", domain, serviceName);
+    }
 
-        var pktBytes = String.format("%s%s%s", serviceName, DELIMITER, serviceURI).getBytes();
+    @Override
+    public void announce(String domain, String serviceName, String serviceURI) {
+        String service = getService(domain, serviceName);
+
+        Log.info(String.format("Starting Discovery announcements on: %s for: %s -> %s\n",
+                DISCOVERY_ADDR, service, serviceURI));
+
+        var pktBytes = String.format("%s%s%s", service, DELIMITER, serviceURI).getBytes();
         var pkt = new DatagramPacket(pktBytes, pktBytes.length, DISCOVERY_ADDR);
 
         // start thread to send periodic announcements
@@ -106,13 +113,15 @@ class DiscoveryImpl implements Discovery {
     }
 
     @Override
-    public URI[] knownUrisOf(String serviceName, int minEntries) {
+    public URI[] knownUrisOf(String domain, String serviceName, int minEntries) {
+        String service = getService(domain, serviceName);
+
         var cache = discovered.get(serviceName);
 
         try {
             while (cache == null || cache.size() < minEntries) {
                 Thread.sleep(DISCOVERY_RETRY_TIMEOUT);
-                cache = discovered.get(serviceName);
+                cache = discovered.get(service);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
