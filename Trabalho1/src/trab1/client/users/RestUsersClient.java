@@ -10,15 +10,15 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
-import java.net.URI;
 import java.util.List;
 
-
 public class RestUsersClient extends RestClient implements UsersService {
+    private static final String SERVICE_FMT = "%s:users";
+
     private final WebTarget target;
 
-    public RestUsersClient(URI serverURI) {
-        super(serverURI);
+    public RestUsersClient(String domain) {
+        super(String.format(SERVICE_FMT, domain));
         this.target = client.target(serverURI).path(UsersService.PATH);
     }
 
