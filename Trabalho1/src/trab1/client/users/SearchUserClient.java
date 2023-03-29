@@ -1,5 +1,9 @@
 package trab1.client.users;
 
+import java.util.List;
+
+import trab1.User;
+
 public class SearchUserClient {
     public static void main(String[] args) throws InterruptedException {
         if (args.length != 2) {
@@ -12,6 +16,8 @@ public class SearchUserClient {
 
         System.out.println("Sending request to server.");
 
-        new RestUsersClient(domain).searchUsers(pattern);
+        List<User> usrs = new RestUsersClient(domain).searchUsers(pattern);
+
+        usrs.forEach(System.out::println);
     }
 }

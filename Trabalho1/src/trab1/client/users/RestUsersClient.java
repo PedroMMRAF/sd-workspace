@@ -25,7 +25,6 @@ public class RestUsersClient extends RestClient implements UsersService {
     }
 
     private String clt_createUser(User user) {
-        System.out.println(target);
         Response r = target.request()
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.json(user));

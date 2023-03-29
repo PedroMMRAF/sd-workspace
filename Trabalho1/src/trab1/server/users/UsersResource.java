@@ -34,7 +34,7 @@ public class UsersResource implements UsersService {
             throw new WebApplicationException(Status.CONFLICT);
         }
 
-        users.put(user.getIdentifier(), user);
+        users.put(user.getName(), user);
 
         return user.getIdentifier();
     }
