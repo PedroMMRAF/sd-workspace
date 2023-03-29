@@ -157,5 +157,14 @@ public class RestFeedsClient extends RestClient implements FeedsService {
     public void subUserOtherDomain(String user, String userSub, String domain) {
     }
 
+    @Override
+    public void unsubUserOtherDomain(String user, String userSub, String domain) {
+    }
+
+    @Override
+    public long postMessageOtherDomain(String user, String domain, Message msg) {
+        return 0;
+    }
+
     // #endregion
 }

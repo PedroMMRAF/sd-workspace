@@ -58,12 +58,34 @@ public class FeedsResource implements FeedsService {
 
         allMessages.put(id, msg);
         for (String u : followers.get(user)) {
+            String subDomain = u.split("@")[1];
+
+        if (!subDomain.equals(Domain.get())){
+            postMessagePropagate(u, msg);
+        }
+            
             Map<Long, Message> userFeed = feeds.get(u);
             userFeed.put(id, msg);
         }
         feeds.get(user).put(id, msg);
 
         return id;
+    }
+
+    @Override
+    public long postMessageOtherDomain(String user, String domain, Message msg) {
+        if (msg == null)
+            throw new WebApplicationException(Status.BAD_REQUEST);
+
+        feeds.putIfAbsent(user, new HashMap<>());
+
+
+        allMessages.put(msg.getId(), msg);
+            
+        Map<Long, Message> userFeed = feeds.get(user);
+        userFeed.put(msg.getId(), msg);
+        
+        return msg.getId();
     }
 
     @Override
@@ -142,6 +164,23 @@ public class FeedsResource implements FeedsService {
     public void unsubscribeUser(String user, String userSub, String pwd) {
         getUser(user, pwd);
 
+        String subDomain = userSub.split("@")[1];
+
+        if (!subDomain.equals(Domain.get()))
+            unsubUserPropagate(user, userSub);
+
+        if (!feeds.containsKey(userSub))
+            throw new WebApplicationException(Status.NOT_FOUND);
+
+        following.putIfAbsent(user, new HashSet<>());
+        followers.putIfAbsent(userSub, new HashSet<>());
+
+        following.get(user).remove(userSub);
+        followers.get(userSub).remove(user);
+    }
+
+    @Override
+    public void unsubUserOtherDomain(String user, String userSub, String domain) {
         if (!feeds.containsKey(userSub))
             throw new WebApplicationException(Status.NOT_FOUND);
 
@@ -204,4 +243,52 @@ public class FeedsResource implements FeedsService {
 
         throw new WebApplicationException(Status.FORBIDDEN);
     }
+
+    
+    private void unsubUserPropagate(String user, String userSub) {
+        URI serverURI = Discovery.getInstance().knownUrisOf(userSub.split("@")[1], FeedsServer.SERVICE, 1)[0];
+
+        Log.info("Sending user sub...");
+
+        ClientConfig config = new ClientConfig();
+        Client client = ClientBuilder.newClient(config);
+
+        WebTarget target = client.target(serverURI).path(FeedsService.PATH);
+
+        Response response = target.path("sub").path(user).path(userSub)
+                .queryParam(FeedsService.DOMAIN, user.split("@")[1])
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .delete();
+
+        if (response.getStatus() == Status.NO_CONTENT.getStatusCode())
+            return;
+
+        throw new WebApplicationException(Status.FORBIDDEN);
+    }
+
+    private void postMessagePropagate(String user, Message msg){
+        URI serverURI = Discovery.getInstance().knownUrisOf(user.split("@")[1], FeedsServer.SERVICE, 1)[0];
+
+        Log.info("Sending message...");
+
+        ClientConfig config = new ClientConfig();
+        Client client = ClientBuilder.newClient(config);
+
+        WebTarget target = client.target(serverURI).path(FeedsService.PATH);
+
+        Response response = target.path(user)
+                .queryParam(FeedsService.DOMAIN, user.split("@")[1])
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(msg, MediaType.APPLICATION_JSON));
+
+        if (response.getStatus() == Status.NO_CONTENT.getStatusCode())
+            return;
+
+        throw new WebApplicationException(Status.FORBIDDEN);
+    }
+
+    
+
 }

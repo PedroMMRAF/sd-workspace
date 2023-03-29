@@ -49,6 +49,28 @@ public interface FeedsService {
 	long postMessage(@PathParam(USER) String user, @QueryParam(PWD) String pwd, Message msg);
 
 	/**
+	 * Posts a new message in the feed, associating it to the feed of the specific
+	 * user.
+	 * A message should be identified before publish it, by assigning an ID.
+	 * A user must contact the server of her domain directly (i.e., this operation
+	 * should not be
+	 * propagated to other domain)
+	 *
+	 * @param user user of the operation (format user@domain)
+	 * @param domain domain of the user that is receiving a message
+	 * @param msg  the message object to be posted to the server
+	 * @return 200 the unique numerical identifier for the posted message;
+	 *         403 if the publisher does not exist in the current domain or if the
+	 *         pwd is not correct
+	 *         400 otherwise
+	 */
+	@POST
+	@Path("/{" + USER + "}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	long postMessageOtherDomain(@PathParam(USER) String user,@QueryParam(DOMAIN) String domain, Message msg);
+
+	/**
 	 * Removes the message identified by mid from the feed of user.
 	 * A user must contact the server of her domain directly (i.e., this operation
 	 * should not be
@@ -150,6 +172,25 @@ public interface FeedsService {
 	@DELETE
 	@Path("/sub/{" + USER + "}/{" + USERSUB + "}")
 	void unsubscribeUser(@PathParam(USER) String user, @PathParam(USERSUB) String userSub, @QueryParam(PWD) String pwd);
+
+	/**
+	 * Unsubscribe a user from another domain.
+	 * A user must contact the server of her domain directly (i.e., this operation
+	 * should not be
+	 * propagated to other domain)
+	 *
+	 * @param user    the user subscribing (following) other user (format
+	 *                user@domain)
+	 * @param userSub the user to be subscribed (followed) (format user@domain)
+	 * @return 204 if ok
+	 *         404 is generated if the user to be subscribed does not exist
+	 *         403 is generated if the user does not exist or if the pwd is not
+	 *         correct
+	 */
+	@DELETE
+	@Path("/sub/{" + USER + "}/{" + USERSUB + "}")
+	void unsubUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub,
+			@QueryParam(DOMAIN) String domain);
 
 	/**
 	 * Subscribed users.
