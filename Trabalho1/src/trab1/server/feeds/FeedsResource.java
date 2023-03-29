@@ -193,6 +193,8 @@ public class FeedsResource implements FeedsService {
 
     @Override
     public List<String> listSubs(String user) {
+        if(followers.get(user)==null)
+         throw new WebApplicationException(Status.NOT_FOUND);
         return followers.get(user).stream().toList();
     }
 
