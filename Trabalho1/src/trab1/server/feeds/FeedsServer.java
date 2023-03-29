@@ -40,5 +40,4 @@ public class FeedsServer {
             Log.severe(e.getMessage());
         }
     }
-
 }

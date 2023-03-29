@@ -16,13 +16,13 @@ import trab1.Message;
 
 @Path(FeedsService.PATH)
 public interface FeedsService {
-
 	String MID = "mid";
 	String PWD = "pwd";
 	String USER = "user";
 	String TIME = "time";
 	String DOMAIN = "domain";
 	String USERSUB = "userSub";
+	String PROPAGATE = "propagate";
 
 	String PATH = "/feeds";
 
@@ -57,7 +57,6 @@ public interface FeedsService {
 	 * propagated to other domain)
 	 *
 	 * @param user user of the operation (format user@domain)
-	 * @param domain domain of the user that is receiving a message
 	 * @param msg  the message object to be posted to the server
 	 * @return 200 the unique numerical identifier for the posted message;
 	 *         403 if the publisher does not exist in the current domain or if the
@@ -65,10 +64,10 @@ public interface FeedsService {
 	 *         400 otherwise
 	 */
 	@POST
-	@Path("/{" + USER + "}")
+	@Path("/" + PROPAGATE + "/{" + USER + "}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	long postMessageOtherDomain(@PathParam(USER) String user,@QueryParam(DOMAIN) String domain, Message msg);
+	long postMessageOtherDomain(@PathParam(USER) String user, Message msg);
 
 	/**
 	 * Removes the message identified by mid from the feed of user.
@@ -150,12 +149,11 @@ public interface FeedsService {
 	 *         correct
 	 */
 	@POST
-	@Path("/sub/{" + USER + "}/{" + USERSUB + "}")
-	void subUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub,
-			@QueryParam(DOMAIN) String domain);
+	@Path("/" + PROPAGATE + "/sub/{" + USER + "}/{" + USERSUB + "}")
+	void subUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub);
 
 	/**
-	 * UnSubscribe a user
+	 * Unsubscribe a user
 	 * A user must contact the server of her domain directly (i.e., this operation
 	 * should not be
 	 * propagated to other domain)
@@ -188,9 +186,8 @@ public interface FeedsService {
 	 *         correct
 	 */
 	@DELETE
-	@Path("/sub/{" + USER + "}/{" + USERSUB + "}")
-	void unsubUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub,
-			@QueryParam(DOMAIN) String domain);
+	@Path("/" + PROPAGATE + "/{" + USER + "}/{" + USERSUB + "}")
+	void unsubUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub);
 
 	/**
 	 * Subscribed users.

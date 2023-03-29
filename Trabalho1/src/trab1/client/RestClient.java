@@ -42,7 +42,6 @@ public class RestClient {
 			try {
 				return func.get();
 			} catch (ProcessingException x) {
-				System.err.println(x.getMessage());
 				Log.fine("ProcessingException: " + x.getMessage());
 				sleep(RETRY_SLEEP);
 			} catch (Exception x) {

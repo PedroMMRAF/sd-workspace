@@ -1,12 +1,15 @@
 package trab1.client.users;
 
+import java.util.logging.Logger;
+
 import trab1.User;
 
 public class UpdateUserClient {
+    private static Logger Log = Logger.getLogger(UpdateUserClient.class.getName());
+
     public static void main(String[] args) throws InterruptedException {
         if (args.length != 5) {
-            System.err.println(
-                    "Use: java trab1.client.users.UpdateUserClient domain name pwd newPwd displayName");
+            Log.severe("Use: java trab1.client.users.UpdateUserClient domain name pwd newPwd displayName");
             return;
         }
 
@@ -18,7 +21,7 @@ public class UpdateUserClient {
 
         User user = new User(name, newPwd, domain, displayName);
 
-        System.out.println("Sending request to server.");
+        Log.info("Sending request to server.");
 
         new RestUsersClient(domain).updateUser(name, pwd, user);
     }

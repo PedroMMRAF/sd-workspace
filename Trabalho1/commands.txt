@@ -1,0 +1,11 @@
+# Maven compile
+mvn clean compile assembly:single docker:build
+
+# Run Users Server
+docker run --rm -h feeds.nova --name feeds.nova --network sdnet -p 8080:8080 sd2223-trab1-60694-60814 java -cp sd2223.jar trab1.server.users.UsersServer nova
+
+# Run Users CreateUserClient
+docker run --rm --name users --network sdnet sd2223-trab1-60694-60814 java -cp sd2223.jar trab1.client.users.CreateUserClient nova john 12345 John
+
+
+docker kill <docker-name>

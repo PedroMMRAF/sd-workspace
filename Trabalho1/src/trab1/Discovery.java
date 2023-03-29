@@ -89,8 +89,9 @@ class DiscoveryImpl implements Discovery {
     public void announce(String domain, String serviceName, String serviceURI) {
         String service = getService(domain, serviceName);
 
-        Log.info(String.format("Starting Discovery announcements on: %s for: %s -> %s\n",
-                DISCOVERY_ADDR, service, serviceURI));
+        // Log.info(String.format("Starting Discovery announcements on: %s for: %s ->
+        // %s\n",
+        // DISCOVERY_ADDR, service, serviceURI));
 
         var pktBytes = String.format("%s%s%s", service, DELIMITER, serviceURI).getBytes();
         var pkt = new DatagramPacket(pktBytes, pktBytes.length, DISCOVERY_ADDR);
@@ -146,7 +147,7 @@ class DiscoveryImpl implements Discovery {
                         ms.receive(pkt);
 
                         var msg = new String(pkt.getData(), 0, pkt.getLength());
-                        Log.info(String.format("Received: %s", msg));
+                        // Log.info(String.format("Received: %s", msg));
 
                         var parts = msg.split(DELIMITER);
                         if (parts.length == 2) {

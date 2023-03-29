@@ -6,21 +6,20 @@ import jakarta.inject.Singleton;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.logging.Logger;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class UsersResource implements UsersService {
-
     private static Logger Log = Logger.getLogger(UsersResource.class.getName());
 
     private final Map<String, User> users;
 
     public UsersResource() {
-        users = new HashMap<>();
+        users = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -41,16 +40,16 @@ public class UsersResource implements UsersService {
     }
 
     @Override
-    public User getUser(String userName, String password) {
-        Log.info("getUser : user = " + userName + "; pwd = " + password);
+    public User getUser(String name, String pwd) {
+        Log.info("getUser : user = " + name + "; pwd = " + pwd);
 
-        User user = users.get(userName);
+        User user = users.get(name);
 
         if (user == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        if (!user.getPwd().equals(password)) {
+        if (!user.getPwd().equals(pwd)) {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
 
@@ -58,28 +57,28 @@ public class UsersResource implements UsersService {
     }
 
     @Override
-    public User updateUser(String userName, String password, User newUser) {
-        Log.info("updateUser : user = " + userName + "; pwd = " + password + " ; user = " + newUser);
+    public User updateUser(String name, String pwd, User user) {
+        Log.info("updateUser : user = " + name + "; pwd = " + pwd + " ; user = " + user);
 
-        if (newUser == null) {
+        if (user == null) {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
 
-        User user = getUser(userName, password);
+        User oldUser = getUser(name, pwd);
 
-        user.setPwd(newUser.getPwd());
-        user.setDisplayName(newUser.getDisplayName());
+        oldUser.setPwd(user.getPwd());
+        oldUser.setDisplayName(user.getDisplayName());
 
         return user;
     }
 
     @Override
-    public User deleteUser(String userName, String password) {
-        Log.info("deleteUser : user = " + userName + "; pwd = " + password);
+    public User deleteUser(String name, String pwd) {
+        Log.info("deleteUser : user = " + name + "; pwd = " + pwd);
 
-        getUser(userName, password);
+        getUser(name, pwd);
 
-        return users.remove(userName);
+        return users.remove(name);
     }
 
     @Override
@@ -104,5 +103,4 @@ public class UsersResource implements UsersService {
 
         return matched;
     }
-
 }

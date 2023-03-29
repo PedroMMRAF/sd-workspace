@@ -3,6 +3,7 @@ package trab1.client.users;
 import trab1.User;
 import trab1.client.RestClient;
 import trab1.rest.UsersService;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.GenericType;
@@ -19,19 +20,20 @@ public class RestUsersClient extends RestClient implements UsersService {
 
     public RestUsersClient(String domain) {
         super(domain, SERVICE);
-        this.target = client.target(serverURI).path(UsersService.PATH);
+
+        target = client.target(serverURI).path(UsersService.PATH);
     }
 
     private String clt_createUser(User user) {
+        System.out.println(target);
         Response r = target.request()
                 .accept(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(user, MediaType.APPLICATION_JSON));
+                .post(Entity.json(user));
 
         if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity())
             return r.readEntity(String.class);
 
-        printErrorStatus(r.getStatus());
-        return null;
+        throw new WebApplicationException(r.getStatus());
     }
 
     private User clt_getUser(String name, String pwd) {
@@ -44,8 +46,7 @@ public class RestUsersClient extends RestClient implements UsersService {
         if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity())
             return r.readEntity(User.class);
 
-        printErrorStatus(r.getStatus());
-        return null;
+        throw new WebApplicationException(r.getStatus());
     }
 
     private User clt_updateUser(String name, String pwd, User user) {
@@ -53,13 +54,12 @@ public class RestUsersClient extends RestClient implements UsersService {
                 .queryParam(UsersService.PWD, pwd)
                 .request()
                 .accept(MediaType.APPLICATION_JSON)
-                .put(Entity.entity(user, MediaType.APPLICATION_JSON));
+                .put(Entity.json(user));
 
         if (r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity())
             return r.readEntity(User.class);
 
-        printErrorStatus(r.getStatus());
-        return null;
+        throw new WebApplicationException(r.getStatus());
     }
 
     private User clt_deleteUser(String name, String pwd) {
@@ -72,8 +72,7 @@ public class RestUsersClient extends RestClient implements UsersService {
         if (r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity())
             return r.readEntity(User.class);
 
-        printErrorStatus(r.getStatus());
-        return null;
+        throw new WebApplicationException(r.getStatus());
     }
 
     private List<User> clt_searchUsers(String pattern) {
@@ -86,40 +85,31 @@ public class RestUsersClient extends RestClient implements UsersService {
             return r.readEntity(new GenericType<>() {
             });
 
-        printErrorStatus(r.getStatus());
-        return null;
-    }
-
-    // #region Ignore
-
-    private void printErrorStatus(int code) {
-        System.out.printf("Error, HTTP error status %s", Status.fromStatusCode(code));
+        throw new WebApplicationException(r.getStatus());
     }
 
     @Override
     public String createUser(User user) {
-        return super.retry(() -> clt_createUser(user));
+        return retry(() -> clt_createUser(user));
     }
 
     @Override
     public User getUser(String name, String pwd) {
-        return super.retry(() -> clt_getUser(name, pwd));
+        return retry(() -> clt_getUser(name, pwd));
     }
 
     @Override
     public User updateUser(String name, String pwd, User user) {
-        return super.retry(() -> clt_updateUser(name, pwd, user));
+        return retry(() -> clt_updateUser(name, pwd, user));
     }
 
     @Override
     public User deleteUser(String name, String pwd) {
-        return super.retry(() -> clt_deleteUser(name, pwd));
+        return retry(() -> clt_deleteUser(name, pwd));
     }
 
     @Override
     public List<User> searchUsers(String pattern) {
-        return super.retry(() -> clt_searchUsers(pattern));
+        return retry(() -> clt_searchUsers(pattern));
     }
-
-    // #endregion
 }

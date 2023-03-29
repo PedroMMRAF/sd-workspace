@@ -17,7 +17,6 @@ import trab1.User;
 
 @Path(UsersService.PATH)
 public interface UsersService {
-
     String PWD = "pwd";
     String NAME = "name";
     String QUERY = "query";

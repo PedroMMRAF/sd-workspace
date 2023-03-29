@@ -27,7 +27,7 @@ public class RestFeedsClient extends RestClient implements FeedsService {
                 .queryParam(FeedsService.PWD, pwd)
                 .request()
                 .accept(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(msg, MediaType.APPLICATION_JSON));
+                .post(Entity.json(msg));
 
         if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity())
             return r.readEntity(Long.class);
@@ -78,7 +78,7 @@ public class RestFeedsClient extends RestClient implements FeedsService {
         Response response = target.path("sub").path(user).path(userSub)
                 .queryParam(FeedsService.PWD, pwd).request()
                 .accept(MediaType.APPLICATION_JSON)
-                .post(Entity.entity(null, MediaType.APPLICATION_JSON));
+                .post(Entity.json(null));
 
         if (response.getStatus() == Status.NO_CONTENT.getStatusCode())
             return 0;
@@ -111,8 +111,6 @@ public class RestFeedsClient extends RestClient implements FeedsService {
         printErrorStatus(response.getStatus());
         return null;
     }
-
-    // #region Ignore
 
     private void printErrorStatus(int code) {
         System.out.printf("Error, HTTP error status %s", Status.fromStatusCode(code));
@@ -154,17 +152,17 @@ public class RestFeedsClient extends RestClient implements FeedsService {
     }
 
     @Override
-    public void subUserOtherDomain(String user, String userSub, String domain) {
+    public long postMessageOtherDomain(String user, Message msg) {
+        throw new UnsupportedOperationException("Unimplemented method 'postMessageOtherDomain'");
     }
 
     @Override
-    public void unsubUserOtherDomain(String user, String userSub, String domain) {
+    public void subUserOtherDomain(String user, String userSub) {
+        throw new UnsupportedOperationException("Unimplemented method 'subUserOtherDomain'");
     }
 
     @Override
-    public long postMessageOtherDomain(String user, String domain, Message msg) {
-        return 0;
+    public void unsubUserOtherDomain(String user, String userSub) {
+        throw new UnsupportedOperationException("Unimplemented method 'unsubUserOtherDomain'");
     }
-
-    // #endregion
 }

@@ -1,12 +1,15 @@
 package trab1.client.users;
 
+import java.util.logging.Logger;
+
 import trab1.User;
 
 public class CreateUserClient {
+    private static Logger Log = Logger.getLogger(UpdateUserClient.class.getName());
+
     public static void main(String[] args) throws InterruptedException {
         if (args.length != 4) {
-            System.err.println(
-                    "Use: java trab1.client.users.CreateUserClient domain name pwd displayName");
+            Log.severe("Use: java trab1.client.users.CreateUserClient domain name pwd displayName");
             return;
         }
 
@@ -17,8 +20,13 @@ public class CreateUserClient {
 
         User user = new User(name, pwd, domain, displayName);
 
-        System.out.println("Sending request to server.");
+        System.out.println(user);
 
-        new RestUsersClient(domain).createUser(user);
+        Log.info("Sending request to server.");
+
+        String result = new RestUsersClient(domain).createUser(user);
+
+        if (result != null)
+            Log.info("Created user with name " + result);
     }
 }
