@@ -4,6 +4,7 @@ import trab1.Message;
 import trab1.client.RestClient;
 import trab1.rest.FeedsService;
 import trab1.rest.UsersService;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.GenericType;
@@ -32,8 +33,7 @@ public class RestFeedsClient extends RestClient implements FeedsService {
         if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity())
             return r.readEntity(Long.class);
 
-        printErrorStatus(r.getStatus());
-        return 0;
+        throw new WebApplicationException(r.getStatus());
     }
 
     public int clt_removeFromPersonalFeed(String user, long mid, String pwd) {
@@ -46,74 +46,64 @@ public class RestFeedsClient extends RestClient implements FeedsService {
         if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity())
             return 0;
 
-        printErrorStatus(r.getStatus());
-        return 0;
+        throw new WebApplicationException(r.getStatus());
     }
 
     public Message clt_getMessage(String user, long mid) {
-        Response response = target.path(user).path(Long.toString(mid))
+        Response r = target.path(user).path(Long.toString(mid))
                 .request().accept(MediaType.APPLICATION_JSON).get();
 
-        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
-            return response.readEntity(Message.class);
+        if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity())
+            return r.readEntity(Message.class);
 
-        printErrorStatus(response.getStatus());
-        return null;
+        throw new WebApplicationException(r.getStatus());
     }
 
     public List<Message> clt_getMessages(String user, long time) {
-        Response response = target.path(user)
+        Response r = target.path(user)
                 .queryParam(FeedsService.TIME, time).request()
                 .accept(MediaType.APPLICATION_JSON).get();
 
-        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
-            return response.readEntity(new GenericType<>() {
+        if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity())
+            return r.readEntity(new GenericType<>() {
             });
 
-        printErrorStatus(response.getStatus());
-        return null;
+        throw new WebApplicationException(r.getStatus());
     }
 
     public int clt_subUser(String user, String userSub, String pwd) {
-        Response response = target.path("sub").path(user).path(userSub)
+        Response r = target.path("sub").path(user).path(userSub)
                 .queryParam(FeedsService.PWD, pwd).request()
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.json(null));
 
-        if (response.getStatus() == Status.NO_CONTENT.getStatusCode())
+        if (r.getStatus() == Status.NO_CONTENT.getStatusCode())
             return 0;
 
-        printErrorStatus(response.getStatus());
-        return 0;
+        throw new WebApplicationException(r.getStatus());
     }
 
     public int clt_unsubscribeUser(String user, String userSub, String pwd) {
-        Response response = target.path("sub").path(user).path(userSub)
+        Response r = target.path("sub").path(user).path(userSub)
                 .queryParam(FeedsService.PWD, pwd)
                 .request().accept(MediaType.APPLICATION_JSON).delete();
 
-        if (response.getStatus() == Status.NO_CONTENT.getStatusCode())
+        if (r.getStatus() == Status.NO_CONTENT.getStatusCode())
             return 0;
 
-        printErrorStatus(response.getStatus());
-        return 0;
+        throw new WebApplicationException(r.getStatus());
     }
 
     public List<String> clt_listSubs(String user) {
-        Response response = target.path("sub").path("list").path(user)
+        Response r = target.path("sub").path("list").path(user)
                 .request().accept(MediaType.APPLICATION_JSON)
                 .delete();
 
-        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
-            return response.readEntity(new GenericType<>() {
+        if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity())
+            return r.readEntity(new GenericType<>() {
             });
 
-        printErrorStatus(response.getStatus());
-        return null;
-    }
-
-    private void printErrorStatus(int code) {
-        System.out.printf("Error, HTTP error status %s", Status.fromStatusCode(code));
+        throw new WebApplicationException(r.getStatus());
     }
 
     @Override

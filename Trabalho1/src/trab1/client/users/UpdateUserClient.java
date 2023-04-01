@@ -7,6 +7,11 @@ import trab1.User;
 public class UpdateUserClient {
     private static Logger Log = Logger.getLogger(UpdateUserClient.class.getName());
 
+    static {
+        System.setProperty("java.net.preferIPv4Stack", "true");
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s\n");
+    }
+
     public static void main(String[] args) throws InterruptedException {
         if (args.length != 5) {
             Log.severe("Use: java trab1.client.users.UpdateUserClient domain name pwd newPwd displayName");

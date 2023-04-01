@@ -7,5 +7,7 @@ docker run --rm -h feeds.nova --name feeds.nova --network sdnet -p 8080:8080 sd2
 # Run Users CreateUserClient
 docker run --rm --name users --network sdnet sd2223-trab1-60694-60814 java -cp sd2223.jar trab1.client.users.CreateUserClient nova john 12345 John
 
+# Run tests
+.\test-sd-tp1.bat -image sd2223-trab1-60694-60814
 
 docker kill <docker-name>

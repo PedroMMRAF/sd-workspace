@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Logger;
 
 import trab1.Domain;
 import trab1.Message;
@@ -14,6 +15,8 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;
 
 public class FeedsResource extends FeedsRest implements FeedsService {
+    private static Logger Log = Logger.getLogger(FeedsResource.class.getName());
+
     private final Map<String, Map<Long, Message>> feeds;
     private final Map<String, Set<String>> followers;
     private final Map<String, Set<String>> following;
@@ -28,7 +31,12 @@ public class FeedsResource extends FeedsRest implements FeedsService {
 
     @Override
     public long postMessage(String user, String pwd, Message msg) {
-        if (msg == null)
+        Log.info("postMessage : " + msg);
+
+        if (msg == null
+                || msg.getUser() == null
+                || msg.getDomain() == null
+                || msg.getText() == null)
             throw new WebApplicationException(Status.BAD_REQUEST);
 
         getUser(user, pwd);

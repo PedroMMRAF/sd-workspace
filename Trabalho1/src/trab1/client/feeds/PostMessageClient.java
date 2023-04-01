@@ -3,14 +3,19 @@ package trab1.client.feeds;
 import trab1.Message;
 
 public class PostMessageClient {
+    static {
+        System.setProperty("java.net.preferIPv4Stack", "true");
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s\n");
+    }
+
     public static void main(String[] args) throws InterruptedException {
         if (args.length != 4) {
             System.err.println(
-                    "Use: java trab1.client.users.CreateUserClient domain user pwd text");
+                    "Use: java trab1.client.feeds.PostMessageClient domain user pwd text");
             return;
         }
 
-        String domain=args[0];
+        String domain = args[0];
         String user = args[1];
         String pwd = args[2];
         String text = args[3];

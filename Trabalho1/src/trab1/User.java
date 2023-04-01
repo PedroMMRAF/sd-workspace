@@ -56,7 +56,7 @@ public class User {
 		this.domain = domain;
 	}
 
-	public String getIdentifier() {
+	public String identifier() {
 		return String.format("%s@%s", getName(), getDomain());
 	}
 

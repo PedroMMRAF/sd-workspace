@@ -1,6 +1,11 @@
 package trab1.client.feeds;
 
 public class GetMessageClient {
+    static {
+        System.setProperty("java.net.preferIPv4Stack", "true");
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s\n");
+    }
+
     public static void main(String[] args) throws InterruptedException {
         if (args.length != 3) {
             System.err.println(

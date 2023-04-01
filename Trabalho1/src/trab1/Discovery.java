@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+// import java.util.logging.Logger;
 
 /**
  * <p>
@@ -50,7 +50,7 @@ public interface Discovery {
  * Implementation of the multicast discovery service
  */
 class DiscoveryImpl implements Discovery {
-    private static Logger Log = Logger.getLogger(Discovery.class.getName());
+    // private static Logger Log = Logger.getLogger(Discovery.class.getName());
 
     // The pre-aggreed multicast endpoint assigned to perform discovery.
     static final int DISCOVERY_RETRY_TIMEOUT = 5000;
@@ -73,13 +73,13 @@ class DiscoveryImpl implements Discovery {
         return singleton;
     }
 
+    private final Map<String, Cache<String, URI>> discovered;
+
     private DiscoveryImpl() {
         this.startListener();
 
         discovered = new HashMap<>();
     }
-
-    private final Map<String, Cache<String, URI>> discovered;
 
     private String getService(String domain, String serviceName) {
         return String.format("%s:%s", domain, serviceName);
@@ -133,8 +133,9 @@ class DiscoveryImpl implements Discovery {
     }
 
     private void startListener() {
-        Log.info(String.format("Starting discovery on multicast group: %s, port: %d\n",
-                DISCOVERY_ADDR.getAddress(), DISCOVERY_ADDR.getPort()));
+        // Log.info(String.format("Starting discovery on multicast group: %s, port:
+        // %d\n",
+        // DISCOVERY_ADDR.getAddress(), DISCOVERY_ADDR.getPort()));
 
         new Thread(() -> {
             try (var ms = new MulticastSocket(DISCOVERY_ADDR.getPort())) {
