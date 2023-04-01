@@ -35,8 +35,7 @@ public class RestServer {
     }
 
     public WebTarget getServiceTarget(String domain, String service) {
-        String serverURL = Discovery.getInstance().knownUrisOf(domain, service, 1)[0].toString();
-        return client.target(serverURL);
+        return client.target(Discovery.getInstance().knownUrisOf(domain, service, 1)[0].toString());
     }
 
     protected <T> T retry(Supplier<T> func) {

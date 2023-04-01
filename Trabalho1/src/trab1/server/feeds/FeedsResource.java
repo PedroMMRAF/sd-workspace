@@ -29,10 +29,23 @@ public class FeedsResource extends FeedsRest implements FeedsService {
         following = new ConcurrentHashMap<>();
     }
 
+    private Map<Long, Message> getFeed(String user) {
+        feeds.putIfAbsent(user, new ConcurrentHashMap<>());
+        return feeds.get(user);
+    }
+
+    private Set<String> getFollowers(String user) {
+        followers.putIfAbsent(user, new CopyOnWriteArraySet<>());
+        return followers.get(user);
+    }
+
+    private Set<String> getFollowing(String user) {
+        following.putIfAbsent(user, new CopyOnWriteArraySet<>());
+        return following.get(user);
+    }
+
     @Override
     public long postMessage(String user, String pwd, Message msg) {
-        Log.info("postMessage : " + msg);
-
         if (msg == null
                 || msg.getUser() == null
                 || msg.getDomain() == null
@@ -41,67 +54,55 @@ public class FeedsResource extends FeedsRest implements FeedsService {
 
         getUser(user, pwd);
 
-        feeds.putIfAbsent(user, new ConcurrentHashMap<>());
-
         long id = UUID.randomUUID().getMostSignificantBits();
-
         msg.setId(id);
 
-        for (String u : followers.get(user)) {
+        Log.info("postMessage : " + msg);
+
+        for (String u : getFollowers(user)) {
             String subDomain = u.split("@")[1];
 
             if (!subDomain.equals(Domain.get())) {
-                new Thread(() -> {
-                    retry(() -> postMessagePropagate(u, msg));
-                }).start();
+                new Thread(() -> postMessagePropagate(u, msg)).start();
             }
 
-            Map<Long, Message> userFeed = feeds.get(u);
-            userFeed.put(id, msg);
+            getFeed(u).put(id, msg);
         }
 
-        feeds.get(user).put(id, msg);
+        getFeed(user).put(id, msg);
 
         return id;
     }
 
     @Override
     public long postMessageOtherDomain(String user, Message msg) {
-        if (msg == null)
-            throw new WebApplicationException(Status.BAD_REQUEST);
-
-        feeds.putIfAbsent(user, new ConcurrentHashMap<>());
-
-        Map<Long, Message> userFeed = feeds.get(user);
-        userFeed.put(msg.getId(), msg);
+        getFeed(user).put(msg.getId(), msg);
 
         return msg.getId();
     }
 
     @Override
     public void removeFromPersonalFeed(String user, long msgId, String pwd) {
-        if (msgId < 0)
-            throw new WebApplicationException(Status.NOT_FOUND);
+        Log.info("removeFromPersonalFeed : " + msgId);
 
         getUser(user, pwd);
 
-        feeds.putIfAbsent(user, new ConcurrentHashMap<>());
-
-        if (feeds.get(user).remove(msgId) == null)
+        if (getFeed(user).remove(msgId) == null)
             throw new WebApplicationException(Status.NOT_FOUND);
     }
 
     @Override
     public Message getMessage(String user, long msgId) {
-        if (msgId < 0)
-            throw new WebApplicationException(Status.BAD_REQUEST);
+        Log.info("getMessage : " + msgId);
 
-        Map<Long, Message> feed = feeds.get(user);
-
-        if (feed == null)
+        if (!hasUser(user))
             throw new WebApplicationException(Status.NOT_FOUND);
 
-        Message msg = feed.get(msgId);
+        Log.info(user);
+
+        Message msg = getFeed(user).get(msgId);
+
+        getFeed(user).values().forEach((m) -> Log.info(m.toString()));
 
         if (msg == null)
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -111,81 +112,69 @@ public class FeedsResource extends FeedsRest implements FeedsService {
 
     @Override
     public List<Message> getMessages(String user, long time) {
-        Map<Long, Message> feed = feeds.get(user);
+        Log.info("getMessages : " + time);
 
-        if (feed == null)
+        if (!hasUser(user))
             throw new WebApplicationException(Status.NOT_FOUND);
 
-        return feed.values().stream().filter((e) -> e.getCreationTime() >= time).toList();
+        return getFeed(user).values().stream().filter((e) -> e.getCreationTime() >= time).toList();
     }
 
     @Override
     public void subUser(String user, String userSub, String pwd) {
+        Log.info("subUser : " + user + ", " + userSub);
+
         getUser(user, pwd);
 
         String subDomain = userSub.split("@")[1];
+
+        if (!hasUser(userSub))
+            throw new WebApplicationException(Status.NOT_FOUND);
 
         if (!subDomain.equals(Domain.get()))
             subUserPropagate(user, userSub);
 
-        if (!feeds.containsKey(userSub))
-            throw new WebApplicationException(Status.NOT_FOUND);
-
-        following.putIfAbsent(user, new CopyOnWriteArraySet<>());
-        followers.putIfAbsent(userSub, new CopyOnWriteArraySet<>());
-
-        following.get(user).add(userSub);
-        followers.get(userSub).add(user);
+        getFollowing(user).add(userSub);
+        getFollowers(userSub).add(user);
     }
 
     @Override
     public void subUserOtherDomain(String user, String userSub) {
-        if (!feeds.containsKey(userSub))
-            throw new WebApplicationException(Status.NOT_FOUND);
-
-        following.putIfAbsent(user, new CopyOnWriteArraySet<>());
-        followers.putIfAbsent(userSub, new CopyOnWriteArraySet<>());
-
-        following.get(user).add(userSub);
-        followers.get(userSub).add(user);
+        getFollowing(user).add(userSub);
+        getFollowers(userSub).add(user);
     }
 
     @Override
     public void unsubscribeUser(String user, String userSub, String pwd) {
+        Log.info("unsubscribeUser : " + user + ", " + userSub);
+
         getUser(user, pwd);
 
         String subDomain = userSub.split("@")[1];
 
-        if (!subDomain.equals(Domain.get()))
-            retry(() -> unsubUserPropagate(user, userSub));
-
-        if (!feeds.containsKey(userSub))
+        if (!hasUser(userSub))
             throw new WebApplicationException(Status.NOT_FOUND);
 
-        following.putIfAbsent(user, new CopyOnWriteArraySet<>());
-        followers.putIfAbsent(userSub, new CopyOnWriteArraySet<>());
+        if (!subDomain.equals(Domain.get()))
+            unsubUserPropagate(user, userSub);
 
-        following.get(user).remove(userSub);
-        followers.get(userSub).remove(user);
+        getFollowing(user).remove(userSub);
+        getFollowers(userSub).remove(user);
     }
 
     @Override
     public void unsubUserOtherDomain(String user, String userSub) {
-        if (!feeds.containsKey(userSub))
-            throw new WebApplicationException(Status.NOT_FOUND);
-
-        following.putIfAbsent(user, new CopyOnWriteArraySet<>());
-        followers.putIfAbsent(userSub, new CopyOnWriteArraySet<>());
-
-        following.get(user).remove(userSub);
-        followers.get(userSub).remove(user);
+        getFollowing(user).remove(userSub);
+        getFollowers(userSub).remove(user);
     }
 
     @Override
     public List<String> listSubs(String user) {
-        if (followers.get(user) == null)
+        Log.info("listSubs : " + user);
+
+        if (!hasUser(user))
             throw new WebApplicationException(Status.NOT_FOUND);
 
-        return followers.get(user).stream().toList();
+        return getFollowers(user).stream().toList();
     }
 }

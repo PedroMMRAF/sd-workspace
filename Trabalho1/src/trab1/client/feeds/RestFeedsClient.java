@@ -3,7 +3,6 @@ package trab1.client.feeds;
 import trab1.Message;
 import trab1.client.RestClient;
 import trab1.rest.FeedsService;
-import trab1.rest.UsersService;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
@@ -16,11 +15,12 @@ import java.util.List;
 
 public class RestFeedsClient extends RestClient implements FeedsService {
     private static final String SERVICE = "feeds";
+
     private final WebTarget target;
 
     public RestFeedsClient(String domain) {
         super(domain, SERVICE);
-        this.target = client.target(serverURI).path(UsersService.PATH);
+        target = client.target(serverURI).path(FeedsService.PATH);
     }
 
     public long clt_postMessage(String user, String pwd, Message msg) {

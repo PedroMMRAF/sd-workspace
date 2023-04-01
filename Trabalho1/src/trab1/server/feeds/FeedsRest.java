@@ -1,9 +1,10 @@
 package trab1.server.feeds;
 
-import java.util.logging.Logger;
+import java.util.List;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response.Status;
@@ -17,32 +18,46 @@ import trab1.server.RestServer;
 import trab1.server.users.UsersServer;
 
 public class FeedsRest extends RestServer {
-    private static Logger Log = Logger.getLogger(RestServer.class.getName());
-
     private User srv_getUser(String user, String pwd) {
         String[] userInfo = user.split("@");
         String name = userInfo[0];
         String domain = userInfo[1];
 
-        Log.info("Requesting user info...");
+        WebTarget target = getServiceTarget(domain, UsersServer.SERVICE).path(UsersService.PATH);
 
-        WebTarget target = getServiceTarget(domain, UsersServer.SERVICE);
-
-        Response response = target.path(UsersService.PATH).path(name)
+        Response r = target.path(name)
                 .queryParam(UsersService.PWD, pwd)
                 .request()
                 .accept(MediaType.APPLICATION_JSON)
                 .get();
 
-        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
-            return response.readEntity(User.class);
+        if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity())
+            return r.readEntity(User.class);
 
-        throw new WebApplicationException(response.getStatus());
+        throw new WebApplicationException(r.getStatus());
+    }
+
+    private boolean srv_hasUser(String user) {
+        String[] userInfo = user.split("@");
+        String name = userInfo[0];
+        String domain = userInfo[1];
+
+        WebTarget target = getServiceTarget(domain, UsersServer.SERVICE).path(UsersService.PATH);
+
+        Response r = target.queryParam(UsersService.QUERY, name)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+
+        if (r.getStatus() == Status.OK.getStatusCode()
+                && r.readEntity(new GenericType<List<User>>() {
+                }).stream().map(u -> u.getName()).toList().contains(name))
+            return true;
+
+        return false;
     }
 
     private int srv_postMessagePropagate(String user, Message msg) {
-        Log.info("Sending message...");
-
         WebTarget target = getServiceTarget(user.split("@")[1], FeedsServer.SERVICE);
 
         Response response = target.path(FeedsService.PATH).path(FeedsService.PROPAGATE)
@@ -58,8 +73,6 @@ public class FeedsRest extends RestServer {
     }
 
     private int srv_subUserPropagate(String user, String userSub) {
-        Log.info("Sending user sub...");
-
         WebTarget target = getServiceTarget(userSub.split("@")[1], FeedsServer.SERVICE);
 
         Response response = target.path(FeedsService.PATH).path(FeedsService.PROPAGATE)
@@ -75,8 +88,6 @@ public class FeedsRest extends RestServer {
     }
 
     private int srv_unsubUserPropagate(String user, String userSub) {
-        Log.info("Sending user sub...");
-
         WebTarget target = getServiceTarget(userSub.split("@")[1], FeedsServer.SERVICE);
 
         Response response = target.path(FeedsService.PATH).path(FeedsService.PROPAGATE)
@@ -95,15 +106,19 @@ public class FeedsRest extends RestServer {
         return retry(() -> srv_getUser(user, pwd));
     }
 
-    protected int postMessagePropagate(String user, Message msg) {
-        return retry(() -> srv_postMessagePropagate(user, msg));
+    protected boolean hasUser(String user) {
+        return retry(() -> srv_hasUser(user));
     }
 
-    protected int subUserPropagate(String user, String userSub) {
-        return retry(() -> srv_subUserPropagate(user, userSub));
+    protected void postMessagePropagate(String user, Message msg) {
+        retry(() -> srv_postMessagePropagate(user, msg));
     }
 
-    protected int unsubUserPropagate(String user, String userSub) {
-        return retry(() -> srv_unsubUserPropagate(user, userSub));
+    protected void subUserPropagate(String user, String userSub) {
+        retry(() -> srv_subUserPropagate(user, userSub));
+    }
+
+    protected void unsubUserPropagate(String user, String userSub) {
+        retry(() -> srv_unsubUserPropagate(user, userSub));
     }
 }

@@ -20,7 +20,6 @@ public interface FeedsService {
 	String PWD = "pwd";
 	String USER = "user";
 	String TIME = "time";
-	String DOMAIN = "domain";
 	String USERSUB = "userSub";
 	String PROPAGATE = "propagate";
 
@@ -35,8 +34,8 @@ public interface FeedsService {
 	 * propagated to other domain)
 	 *
 	 * @param user user of the operation (format user@domain)
-	 * @param msg  the message object to be posted to the server
 	 * @param pwd  password of the user sending the message
+	 * @param msg  the message object to be posted to the server
 	 * @return 200 the unique numerical identifier for the posted message;
 	 *         403 if the publisher does not exist in the current domain or if the
 	 *         pwd is not correct
@@ -60,7 +59,7 @@ public interface FeedsService {
 	 * @param msg  the message object to be posted to the server
 	 * @return 200 the unique numerical identifier for the posted message;
 	 *         404 if the publisher does not exist in the current domain
-	 *		   403 if the pwd is not correct
+	 *         403 if the pwd is not correct
 	 *         400 otherwise
 	 */
 	@POST
@@ -80,7 +79,8 @@ public interface FeedsService {
 	 * @param pwd  password of the user
 	 * @return 204 if ok
 	 *         403 if the pwd is not correct
-	 * 		   404 is generated if the message does not exist in the server or if the user does not exist
+	 *         404 is generated if the message does not exist in the server or if
+	 *         the user does not exist
 	 */
 	@DELETE
 	@Path("/{" + USER + "}/{" + MID + "}")

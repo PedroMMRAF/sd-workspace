@@ -25,6 +25,8 @@ public interface Discovery {
      */
     void announce(String domain, String serviceName, String serviceURI);
 
+    void kill();
+
     /**
      * Get discovered URIs for a given service name
      *
@@ -73,12 +75,20 @@ class DiscoveryImpl implements Discovery {
         return singleton;
     }
 
+    private boolean running;
     private final Map<String, Cache<String, URI>> discovered;
 
     private DiscoveryImpl() {
         this.startListener();
 
+        running = true;
         discovered = new HashMap<>();
+    }
+
+    @Override
+    public void kill() {
+        running = false;
+        singleton = null;
     }
 
     private String getService(String domain, String serviceName) {
@@ -99,7 +109,7 @@ class DiscoveryImpl implements Discovery {
         // start thread to send periodic announcements
         new Thread(() -> {
             try (var ds = new DatagramSocket()) {
-                while (true) {
+                while (running) {
                     try {
                         ds.send(pkt);
                         Thread.sleep(DISCOVERY_ANNOUNCE_PERIOD);
@@ -117,7 +127,7 @@ class DiscoveryImpl implements Discovery {
     public URI[] knownUrisOf(String domain, String serviceName, int minEntries) {
         String service = getService(domain, serviceName);
 
-        var cache = discovered.get(serviceName);
+        var cache = discovered.get(service);
 
         try {
             while (cache == null || cache.size() < minEntries) {
@@ -141,7 +151,7 @@ class DiscoveryImpl implements Discovery {
             try (var ms = new MulticastSocket(DISCOVERY_ADDR.getPort())) {
                 ms.joinGroup(DISCOVERY_ADDR,
                         NetworkInterface.getByInetAddress(InetAddress.getLocalHost()));
-                while (true) {
+                while (running) {
                     try {
                         var pkt = new DatagramPacket(new byte[MAX_DATAGRAM_SIZE],
                                 MAX_DATAGRAM_SIZE);
