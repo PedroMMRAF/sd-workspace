@@ -73,7 +73,7 @@ public class FeedsResource extends FeedsRest implements FeedsService {
     @Override
     public void removeFromPersonalFeed(String user, long msgId, String pwd) {
         if (msgId < 0)
-            throw new WebApplicationException(Status.BAD_REQUEST);
+            throw new WebApplicationException(Status.NOT_FOUND);
 
         getUser(user, pwd);
 

@@ -37,7 +37,7 @@ public class FeedsRest extends RestServer {
         if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
             return response.readEntity(User.class);
 
-        throw new WebApplicationException(Status.FORBIDDEN);
+        throw new WebApplicationException(response.getStatus());
     }
 
     private int srv_postMessagePropagate(String user, Message msg) {
