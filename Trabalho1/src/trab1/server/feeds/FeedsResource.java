@@ -11,15 +11,17 @@ import java.util.logging.Logger;
 import trab1.Domain;
 import trab1.Message;
 import trab1.rest.FeedsService;
+import jakarta.inject.Singleton;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response.Status;
 
+@Singleton
 public class FeedsResource extends FeedsRest implements FeedsService {
     private static Logger Log = Logger.getLogger(FeedsResource.class.getName());
 
-    private final Map<String, Map<Long, Message>> feeds;
-    private final Map<String, Set<String>> followers;
-    private final Map<String, Set<String>> following;
+    private Map<String, Map<Long, Message>> feeds;
+    private Map<String, Set<String>> followers;
+    private Map<String, Set<String>> following;
 
     public FeedsResource() {
         super();
@@ -46,10 +48,11 @@ public class FeedsResource extends FeedsRest implements FeedsService {
 
     @Override
     public long postMessage(String user, String pwd, Message msg) {
+        Log.info("postMessage : " + msg);
+
         if (msg == null
                 || msg.getUser() == null
-                || msg.getDomain() == null
-                || msg.getText() == null)
+                || msg.getDomain() == null)
             throw new WebApplicationException(Status.BAD_REQUEST);
 
         getUser(user, pwd);
@@ -57,9 +60,7 @@ public class FeedsResource extends FeedsRest implements FeedsService {
         long id = UUID.randomUUID().getMostSignificantBits();
         msg.setId(id);
 
-        Log.info("postMessage : " + msg);
-
-        for (String u : getFollowers(user)) {
+        for (String u : getFollowing(user)) {
             String subDomain = u.split("@")[1];
 
             if (!subDomain.equals(Domain.get())) {
@@ -76,6 +77,8 @@ public class FeedsResource extends FeedsRest implements FeedsService {
 
     @Override
     public long postMessageOtherDomain(String user, Message msg) {
+        Log.info("postMessageOtherDomain : " + msg);
+
         getFeed(user).put(msg.getId(), msg);
 
         return msg.getId();
@@ -98,11 +101,7 @@ public class FeedsResource extends FeedsRest implements FeedsService {
         if (!hasUser(user))
             throw new WebApplicationException(Status.NOT_FOUND);
 
-        Log.info(user);
-
         Message msg = getFeed(user).get(msgId);
-
-        getFeed(user).values().forEach((m) -> Log.info(m.toString()));
 
         if (msg == null)
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -117,7 +116,7 @@ public class FeedsResource extends FeedsRest implements FeedsService {
         if (!hasUser(user))
             throw new WebApplicationException(Status.NOT_FOUND);
 
-        return getFeed(user).values().stream().filter((e) -> e.getCreationTime() >= time).toList();
+        return getFeed(user).values().stream().filter((e) -> e.getCreationTime() > time).toList();
     }
 
     @Override
@@ -134,14 +133,16 @@ public class FeedsResource extends FeedsRest implements FeedsService {
         if (!subDomain.equals(Domain.get()))
             subUserPropagate(user, userSub);
 
-        getFollowing(user).add(userSub);
-        getFollowers(userSub).add(user);
+        getFollowers(user).add(userSub);
+        getFollowing(userSub).add(user);
     }
 
     @Override
     public void subUserOtherDomain(String user, String userSub) {
-        getFollowing(user).add(userSub);
-        getFollowers(userSub).add(user);
+        Log.info("subUserOtherDomain : " + user + ", " + userSub);
+
+        getFollowers(user).add(userSub);
+        getFollowing(userSub).add(user);
     }
 
     @Override
@@ -158,14 +159,16 @@ public class FeedsResource extends FeedsRest implements FeedsService {
         if (!subDomain.equals(Domain.get()))
             unsubUserPropagate(user, userSub);
 
-        getFollowing(user).remove(userSub);
-        getFollowers(userSub).remove(user);
+        getFollowers(user).remove(userSub);
+        getFollowing(userSub).remove(user);
     }
 
     @Override
     public void unsubUserOtherDomain(String user, String userSub) {
-        getFollowing(user).remove(userSub);
-        getFollowers(userSub).remove(user);
+        Log.info("unsubUserOtherDomain : " + user + ", " + userSub);
+
+        getFollowers(user).remove(userSub);
+        getFollowing(userSub).remove(user);
     }
 
     @Override

@@ -46,10 +46,6 @@ public class RestServer {
                 System.err.println(x.getMessage());
                 Log.fine("ProcessingException: " + x.getMessage());
                 sleep(RETRY_SLEEP);
-            } catch (Exception x) {
-                Log.fine("Exception: " + x.getMessage());
-                x.printStackTrace();
-                break;
             }
         }
         return null;

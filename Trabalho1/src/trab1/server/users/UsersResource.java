@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class UsersResource implements UsersService {
-    private static Logger Log = Logger.getLogger(UsersResource.class.getName());
+    private static final Logger Log = Logger.getLogger(UsersResource.class.getName());
 
     private final Map<String, User> users;
 
