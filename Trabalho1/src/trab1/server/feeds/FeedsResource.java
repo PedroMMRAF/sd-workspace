@@ -20,15 +20,15 @@ public class FeedsResource extends FeedsRest implements FeedsService {
     private static Logger Log = Logger.getLogger(FeedsResource.class.getName());
 
     private Map<String, Map<Long, Message>> feeds;
-    private Map<String, Set<String>> followers;
     private Map<String, Set<String>> following;
+    private Map<String, Set<String>> followers;
 
     public FeedsResource() {
         super();
 
         feeds = new ConcurrentHashMap<>();
-        followers = new ConcurrentHashMap<>();
         following = new ConcurrentHashMap<>();
+        followers = new ConcurrentHashMap<>();
     }
 
     private Map<Long, Message> getFeed(String user) {
@@ -36,41 +36,45 @@ public class FeedsResource extends FeedsRest implements FeedsService {
         return feeds.get(user);
     }
 
-    private Set<String> getFollowers(String user) {
-        followers.putIfAbsent(user, new CopyOnWriteArraySet<>());
-        return followers.get(user);
-    }
-
     private Set<String> getFollowing(String user) {
         following.putIfAbsent(user, new CopyOnWriteArraySet<>());
         return following.get(user);
     }
 
+    private Set<String> getFollowers(String user) {
+        followers.putIfAbsent(user, new CopyOnWriteArraySet<>());
+        return followers.get(user);
+    }
+
     @Override
     public long postMessage(String user, String pwd, Message msg) {
-        Log.info("postMessage : " + msg);
+        String userDomain = user.split("@")[1];
 
         if (msg == null
                 || msg.getUser() == null
-                || msg.getDomain() == null)
+                || msg.getDomain() == null
+                || !msg.getDomain().equals(userDomain)
+                || !Domain.get().equals(userDomain))
             throw new WebApplicationException(Status.BAD_REQUEST);
-
-        getUser(user, pwd);
 
         long id = UUID.randomUUID().getMostSignificantBits();
         msg.setId(id);
 
-        for (String u : getFollowing(user)) {
-            String subDomain = u.split("@")[1];
+        Log.info("postMessage : " + msg);
 
-            if (!subDomain.equals(Domain.get())) {
-                new Thread(() -> postMessagePropagate(u, msg)).start();
-            }
-
-            getFeed(u).put(id, msg);
-        }
+        getUser(user, pwd);
 
         getFeed(user).put(id, msg);
+
+        for (String u : getFollowers(user)) {
+            String subDomain = u.split("@")[1];
+
+            if (subDomain.equals(Domain.get())) {
+                getFeed(u).put(id, msg);
+            } else {
+                new Thread(() -> postMessagePropagate(u, msg)).start();
+            }
+        }
 
         return id;
     }
@@ -98,6 +102,11 @@ public class FeedsResource extends FeedsRest implements FeedsService {
     public Message getMessage(String user, long msgId) {
         Log.info("getMessage : " + msgId);
 
+        String userDomain = user.split("@")[1];
+
+        if (!userDomain.equals(Domain.get()))
+            return forwardGetMessage(user, msgId);
+
         if (!hasUser(user))
             throw new WebApplicationException(Status.NOT_FOUND);
 
@@ -112,6 +121,11 @@ public class FeedsResource extends FeedsRest implements FeedsService {
     @Override
     public List<Message> getMessages(String user, long time) {
         Log.info("getMessages : " + time);
+
+        String userDomain = user.split("@")[1];
+
+        if (!userDomain.equals(Domain.get()))
+            return forwardGetMessages(user, time);
 
         if (!hasUser(user))
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -133,16 +147,16 @@ public class FeedsResource extends FeedsRest implements FeedsService {
         if (!subDomain.equals(Domain.get()))
             subUserPropagate(user, userSub);
 
-        getFollowers(user).add(userSub);
-        getFollowing(userSub).add(user);
+        getFollowing(user).add(userSub);
+        getFollowers(userSub).add(user);
     }
 
     @Override
     public void subUserOtherDomain(String user, String userSub) {
         Log.info("subUserOtherDomain : " + user + ", " + userSub);
 
-        getFollowers(user).add(userSub);
-        getFollowing(userSub).add(user);
+        getFollowing(user).add(userSub);
+        getFollowers(userSub).add(user);
     }
 
     @Override
@@ -159,16 +173,16 @@ public class FeedsResource extends FeedsRest implements FeedsService {
         if (!subDomain.equals(Domain.get()))
             unsubUserPropagate(user, userSub);
 
-        getFollowers(user).remove(userSub);
-        getFollowing(userSub).remove(user);
+        getFollowing(user).remove(userSub);
+        getFollowers(userSub).remove(user);
     }
 
     @Override
     public void unsubUserOtherDomain(String user, String userSub) {
         Log.info("unsubUserOtherDomain : " + user + ", " + userSub);
 
-        getFollowers(user).remove(userSub);
-        getFollowing(userSub).remove(user);
+        getFollowing(user).remove(userSub);
+        getFollowers(userSub).remove(user);
     }
 
     @Override
@@ -178,6 +192,6 @@ public class FeedsResource extends FeedsRest implements FeedsService {
         if (!hasUser(user))
             throw new WebApplicationException(Status.NOT_FOUND);
 
-        return getFollowers(user).stream().toList();
+        return getFollowing(user).stream().toList();
     }
 }

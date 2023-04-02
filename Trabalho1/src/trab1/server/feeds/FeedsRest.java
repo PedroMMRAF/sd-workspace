@@ -25,16 +25,16 @@ public class FeedsRest extends RestServer {
 
         WebTarget target = getServiceTarget(domain, UsersServer.SERVICE).path(UsersService.PATH);
 
-        Response r = target.path(name)
+        Response response = target.path(name)
                 .queryParam(UsersService.PWD, pwd)
                 .request()
                 .accept(MediaType.APPLICATION_JSON)
                 .get();
 
-        if (r.getStatus() == Status.OK.getStatusCode() && r.hasEntity())
-            return r.readEntity(User.class);
+        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
+            return response.readEntity(User.class);
 
-        throw new WebApplicationException(r.getStatus());
+        throw new WebApplicationException(response.getStatus());
     }
 
     private boolean srv_hasUser(String user) {
@@ -44,14 +44,20 @@ public class FeedsRest extends RestServer {
 
         WebTarget target = getServiceTarget(domain, UsersServer.SERVICE).path(UsersService.PATH);
 
-        Response r = target.queryParam(UsersService.QUERY, name)
+        Response response = target.queryParam(UsersService.QUERY, name)
                 .request()
                 .accept(MediaType.APPLICATION_JSON)
                 .get();
 
-        if (r.getStatus() == Status.OK.getStatusCode()
-                && r.readEntity(new GenericType<List<User>>() {
-                }).stream().map(u -> u.getName()).toList().contains(name))
+        if (response.getStatus() != Status.OK.getStatusCode())
+            return false;
+
+        List<User> users = response.readEntity(new GenericType<List<User>>() {
+        });
+
+        List<String> userNames = users.stream().map(u -> u.getName()).toList();
+
+        if (userNames.contains(name))
             return true;
 
         return false;
@@ -60,16 +66,16 @@ public class FeedsRest extends RestServer {
     private int srv_postMessagePropagate(String user, Message msg) {
         WebTarget target = getServiceTarget(user.split("@")[1], FeedsServer.SERVICE);
 
-        Response response = target.path(FeedsService.PATH).path(FeedsService.PROPAGATE)
-                .path(user)
+        Response response = target.path(FeedsService.PATH)
+                .path(FeedsService.PROPAGATE).path(user)
                 .request()
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.json(msg));
 
-        if (response.getStatus() == Status.NO_CONTENT.getStatusCode())
+        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
             return 0;
 
-        throw new WebApplicationException(Status.FORBIDDEN);
+        throw new WebApplicationException(response.getStatus());
     }
 
     private int srv_subUserPropagate(String user, String userSub) {
@@ -84,7 +90,7 @@ public class FeedsRest extends RestServer {
         if (response.getStatus() == Status.NO_CONTENT.getStatusCode())
             return 0;
 
-        throw new WebApplicationException(Status.FORBIDDEN);
+        throw new WebApplicationException(response.getStatus());
     }
 
     private int srv_unsubUserPropagate(String user, String userSub) {
@@ -99,7 +105,38 @@ public class FeedsRest extends RestServer {
         if (response.getStatus() == Status.NO_CONTENT.getStatusCode())
             return 0;
 
-        throw new WebApplicationException(Status.FORBIDDEN);
+        throw new WebApplicationException(response.getStatus());
+    }
+
+    private Message srv_forwardGetMessage(String user, long msgId) {
+        WebTarget target = getServiceTarget(user.split("@")[1], FeedsServer.SERVICE);
+
+        Response response = target.path(FeedsService.PATH)
+                .path(user).path(Long.toString(msgId))
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+
+        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
+            return response.readEntity(Message.class);
+
+        throw new WebApplicationException(response.getStatus());
+    }
+
+    private List<Message> srv_forwardGetMessages(String user, long time) {
+        WebTarget target = getServiceTarget(user.split("@")[1], FeedsServer.SERVICE);
+
+        Response response = target.path(FeedsService.PATH)
+                .path(user).queryParam(FeedsService.TIME, time)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+
+        if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity())
+            return response.readEntity(new GenericType<List<Message>>() {
+            });
+
+        throw new WebApplicationException(response.getStatus());
     }
 
     protected User getUser(String user, String pwd) {
@@ -120,5 +157,13 @@ public class FeedsRest extends RestServer {
 
     protected void unsubUserPropagate(String user, String userSub) {
         retry(() -> srv_unsubUserPropagate(user, userSub));
+    }
+
+    protected Message forwardGetMessage(String user, long msgId) {
+        return retry(() -> srv_forwardGetMessage(user, msgId));
+    }
+
+    protected List<Message> forwardGetMessages(String user, long time) {
+        return retry(() -> srv_forwardGetMessages(user, time));
     }
 }

@@ -18,8 +18,10 @@ import trab1.Message;
 public interface FeedsService {
 	String MID = "mid";
 	String PWD = "pwd";
+	String SUB = "sub";
 	String USER = "user";
 	String TIME = "time";
+	String LIST = "list";
 	String USERSUB = "userSub";
 	String PROPAGATE = "propagate";
 
@@ -131,7 +133,7 @@ public interface FeedsService {
 	 *         correct
 	 */
 	@POST
-	@Path("/sub/{" + USER + "}/{" + USERSUB + "}")
+	@Path("/" + SUB + "/{" + USER + "}/{" + USERSUB + "}")
 	void subUser(@PathParam(USER) String user, @PathParam(USERSUB) String userSub, @QueryParam(PWD) String pwd);
 
 	/**
@@ -149,7 +151,7 @@ public interface FeedsService {
 	 *         correct
 	 */
 	@POST
-	@Path("/" + PROPAGATE + "/sub/{" + USER + "}/{" + USERSUB + "}")
+	@Path("/" + PROPAGATE + "/{" + USER + "}/{" + USERSUB + "}")
 	void subUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub);
 
 	/**
@@ -168,7 +170,7 @@ public interface FeedsService {
 	 *         404 is generated if the userSub is not subscribed
 	 */
 	@DELETE
-	@Path("/sub/{" + USER + "}/{" + USERSUB + "}")
+	@Path("/" + SUB + "/{" + USER + "}/{" + USERSUB + "}")
 	void unsubscribeUser(@PathParam(USER) String user, @PathParam(USERSUB) String userSub, @QueryParam(PWD) String pwd);
 
 	/**
@@ -197,7 +199,7 @@ public interface FeedsService {
 	 *         404 is generated if the user does not exist
 	 */
 	@GET
-	@Path("/sub/list/{" + USER + "}")
+	@Path("/" + SUB + "/" + LIST + "/{" + USER + "}")
 	@Produces(MediaType.APPLICATION_JSON)
 	List<String> listSubs(@PathParam(USER) String user);
 }

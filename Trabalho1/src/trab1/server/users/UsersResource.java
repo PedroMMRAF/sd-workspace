@@ -87,18 +87,6 @@ public class UsersResource implements UsersService {
         return users.remove(name);
     }
 
-    private boolean userMatchesPattern(User user, String pattern) {
-        return user.getName().toLowerCase().contains(pattern.toLowerCase());
-    }
-
-    private User userWithoutPassword(User user) {
-        return new User(
-                user.getName(),
-                "",
-                user.getDomain(),
-                user.getDisplayName());
-    }
-
     @Override
     public List<User> searchUsers(String pattern) {
         Log.info("searchUsers : pattern = " + pattern);
@@ -110,5 +98,13 @@ public class UsersResource implements UsersService {
                 .filter(u -> userMatchesPattern(u, pattern))
                 .map(this::userWithoutPassword)
                 .toList();
+    }
+
+    private boolean userMatchesPattern(User user, String pattern) {
+        return user.getName().toLowerCase().contains(pattern.toLowerCase());
+    }
+
+    private User userWithoutPassword(User user) {
+        return new User(user.getName(), "", user.getDomain(), user.getDisplayName());
     }
 }
