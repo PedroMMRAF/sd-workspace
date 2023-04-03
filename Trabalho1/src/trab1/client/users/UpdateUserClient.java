@@ -1,22 +1,13 @@
 package trab1.client.users;
 
-import java.util.logging.Logger;
-
 import trab1.User;
+import trab1.client.ArgChecker;
 
 public class UpdateUserClient {
-    private static Logger Log = Logger.getLogger(UpdateUserClient.class.getName());
-
-    static {
-        System.setProperty("java.net.preferIPv4Stack", "true");
-        System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s\n");
-    }
-
     public static void main(String[] args) throws InterruptedException {
-        if (args.length != 5) {
-            Log.severe("Use: java trab1.client.users.UpdateUserClient domain name pwd newPwd displayName");
-            return;
-        }
+        new ArgChecker(UpdateUserClient.class)
+                .setParams("domain", "name", "pwd", "newPwd", "newDisplayName")
+                .check(args);
 
         String domain = args[0];
         String name = args[1];
@@ -26,8 +17,10 @@ public class UpdateUserClient {
 
         User user = new User(name, newPwd, domain, displayName);
 
-        Log.info("Sending request to server.");
+        System.out.println("Sending request to server.");
 
-        new RestUsersClient(domain).updateUser(name, pwd, user);
+        user = new RestUsersClient(domain).updateUser(name, pwd, user);
+
+        System.out.printf("Updated %s", user);
     }
 }

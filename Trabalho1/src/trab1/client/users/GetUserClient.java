@@ -1,17 +1,13 @@
 package trab1.client.users;
 
-public class GetUserClient {
-    static {
-        System.setProperty("java.net.preferIPv4Stack", "true");
-        System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s\n");
-    }
+import trab1.User;
+import trab1.client.ArgChecker;
 
+public class GetUserClient {
     public static void main(String[] args) throws InterruptedException {
-        if (args.length != 3) {
-            System.err.println(
-                    "Use: java trab1.client.users.GetUserClient domain name pwd");
-            return;
-        }
+        new ArgChecker(GetUserClient.class)
+                .setParams("domain", "name", "pwd")
+                .check(args);
 
         String domain = args[0];
         String name = args[1];
@@ -19,6 +15,8 @@ public class GetUserClient {
 
         System.out.println("Sending request to server.");
 
-        new RestUsersClient(domain).getUser(name, pwd);
+        User user = new RestUsersClient(domain).getUser(name, pwd);
+
+        System.out.println(user);
     }
 }

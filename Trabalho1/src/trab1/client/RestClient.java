@@ -1,15 +1,16 @@
 package trab1.client;
 
 import java.net.URI;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.function.Supplier;
 
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 
-import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.ClientBuilder;
+
 import trab1.Discovery;
 
 public class RestClient {
@@ -47,7 +48,6 @@ public class RestClient {
                 sleep(RETRY_SLEEP);
             } catch (Exception x) {
                 Log.fine("Exception: " + x.getMessage());
-                x.printStackTrace();
                 break;
             }
         }
