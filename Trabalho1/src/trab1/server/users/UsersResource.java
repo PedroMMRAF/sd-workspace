@@ -23,7 +23,7 @@ public class UsersResource implements UsersService {
     }
 
     @Override
-    public String createUser(User user) {
+    synchronized public String createUser(User user) {
         Log.info("createUser : " + user);
 
         if (user == null
@@ -43,7 +43,7 @@ public class UsersResource implements UsersService {
     }
 
     @Override
-    public User getUser(String name, String pwd) {
+    synchronized public User getUser(String name, String pwd) {
         Log.info("getUser : user = " + name + "; pwd = " + pwd);
 
         if (name == null || pwd == null)
@@ -61,7 +61,7 @@ public class UsersResource implements UsersService {
     }
 
     @Override
-    public User updateUser(String name, String pwd, User newUser) {
+    synchronized public User updateUser(String name, String pwd, User newUser) {
         Log.info("updateUser : user = " + name + "; pwd = " + pwd + " ; user = " + newUser);
 
         User user = getUser(name, pwd);
@@ -79,7 +79,7 @@ public class UsersResource implements UsersService {
     }
 
     @Override
-    public User deleteUser(String name, String pwd) {
+    synchronized public User deleteUser(String name, String pwd) {
         Log.info("deleteUser : user = " + name + "; pwd = " + pwd);
 
         getUser(name, pwd);
@@ -88,7 +88,7 @@ public class UsersResource implements UsersService {
     }
 
     @Override
-    public List<User> searchUsers(String pattern) {
+    synchronized public List<User> searchUsers(String pattern) {
         Log.info("searchUsers : pattern = " + pattern);
 
         if (pattern == null)
