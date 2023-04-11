@@ -1,14 +1,14 @@
-package aula5.clients.soap;
+package trab1.clients;
 
 import java.net.URI;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import aula5.api.User;
-import aula5.api.java.Result;
-import aula5.api.java.Users;
-import aula5.api.soap.UsersService;
+import trab1.api.User;
+import trab1.api.java.Result;
+import trab1.api.java.Users;
+import trab1.api.soap.UsersService;
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 
@@ -24,7 +24,7 @@ public class SoapUsersClient extends SoapClient implements Users {
 		if (stub == null) {
 			QName QNAME = new QName(UsersService.NAMESPACE, UsersService.NAME);
 			Service service = Service.create(super.toURL(super.uri + WSDL), QNAME);
-			this.stub = service.getPort(aula5.api.soap.UsersService.class);
+			this.stub = service.getPort(trab1.api.soap.UsersService.class);
 			super.setTimeouts((BindingProvider) stub);
 		}
 		return stub;
@@ -41,23 +41,17 @@ public class SoapUsersClient extends SoapClient implements Users {
 	}
 
 	@Override
-	public Result<Void> verifyPassword(String name, String pwd) {
-		return super.reTry(() -> super.toJavaResult(() -> stub().verifyPassword(name, pwd)));
-	}
-
-	@Override
 	public Result<User> updateUser(String name, String pwd, User user) {
-		throw new RuntimeException("Not Implemented...");
+		return super.reTry(() -> super.toJavaResult(() -> stub().updateUser(name, pwd, user)));
 	}
 
 	@Override
 	public Result<User> deleteUser(String name, String pwd) {
-		throw new RuntimeException("Not Implemented...");
+		return super.reTry(() -> super.toJavaResult(() -> stub().deleteUser(name, pwd)));
 	}
 
 	@Override
 	public Result<List<User>> searchUsers(String pattern) {
-		throw new RuntimeException("Not Implemented...");
+		return super.reTry(() -> super.toJavaResult(() -> stub().searchUsers(pattern)));
 	}
-
 }

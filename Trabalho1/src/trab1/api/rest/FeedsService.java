@@ -25,6 +25,7 @@ public interface FeedsService {
 	String PROPAGATE = "propagate";
 
 	String PATH = "/feeds";
+	String NAMESPACE = "http://sd2223";
 
 	/**
 	 * Posts a new message in the feed, associating it to the feed of the specific
