@@ -1,71 +1,76 @@
 package trab1.api.java;
 
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.Response;
+
 /**
  * 
  * Represents the result of an operation, either wrapping a result of the given
- * type,
- * or an error.
+ * type, or an error.
  * 
  * @param <T> type of the result value associated with success
  */
 public interface Result<T> {
-	/**
-	 * Service errors:
-	 * OK - no error, implies a non-null result of type T, except for for
-	 * Void operations
-	 * CONFLICT - something is being created but already exists
-	 * NOT_FOUND - an access occurred to something that does not exist
-	 * INTERNAL_ERROR - something unexpected happened
-	 */
 	enum ErrorCode {
-		OK, CONFLICT, NOT_FOUND, BAD_REQUEST, FORBIDDEN, INTERNAL_ERROR, NOT_IMPLEMENTED, TIMEOUT
+		OK, CONFLICT, NOT_FOUND, BAD_REQUEST, FORBIDDEN, INTERNAL_ERROR, NOT_IMPLEMENTED, TIMEOUT;
+
+		public static ErrorCode fromStatusCode(int statusCode) {
+			return switch (statusCode) {
+				case 200, 204 -> OK;
+				case 400 -> BAD_REQUEST;
+				case 403 -> FORBIDDEN;
+				case 404 -> NOT_FOUND;
+				case 409 -> CONFLICT;
+				case 405 -> NOT_IMPLEMENTED;
+				case 408 -> TIMEOUT;
+				case 500 -> INTERNAL_ERROR;
+				default -> INTERNAL_ERROR;
+			};
+		}
+
+		public static int toStatusCode(ErrorCode err) {
+			return switch (err) {
+				case OK -> 200;
+				case BAD_REQUEST -> 400;
+				case FORBIDDEN -> 403;
+				case NOT_FOUND -> 404;
+				case NOT_IMPLEMENTED -> 405;
+				case TIMEOUT -> 408;
+				case CONFLICT -> 409;
+				case INTERNAL_ERROR -> 500;
+			};
+		}
 	};
 
-	/**
-	 * Tests if the result is an error.
-	 */
 	boolean isOK();
 
-	/**
-	 * Obtains the payload value of this result
-	 * 
-	 * @return the value of this result.
-	 */
 	T value();
 
-	/**
-	 * Obtains the error code of this result
-	 * 
-	 * @return the error code
-	 */
 	ErrorCode error();
 
-	/**
-	 * Convenience method for returning non error results of the given type
-	 * 
-	 * @param Class of value of the result
-	 * @return the value of the result
-	 */
 	static <T> Result<T> ok(T result) {
 		return new OkResult<>(result);
 	}
 
-	/**
-	 * Convenience method for returning non error results without a value
-	 * 
-	 * @return non-error result
-	 */
 	static <T> Result<T> ok() {
 		return new OkResult<>(null);
 	}
 
-	/**
-	 * Convenience method used to return an error
-	 * 
-	 * @return
-	 */
 	static <T> Result<T> error(ErrorCode error) {
 		return new ErrorResult<>(error);
+	}
+
+	static <T> Result<T> fromResponse(Response res) {
+		ErrorCode err = ErrorCode.fromStatusCode(res.getStatus());
+
+		if (err == ErrorCode.OK)
+			if (res.hasEntity())
+				return new OkResult<>(res.readEntity(new GenericType<>() {
+				}));
+			else
+				return new OkResult<>(null);
+
+		return new ErrorResult<>(ErrorCode.fromStatusCode(res.getStatus()));
 	}
 }
 

@@ -37,10 +37,10 @@ abstract class SoapClient {
 
 	protected static final String WSDL = "?wsdl";
 
-	protected final URI uri;
+	protected final URI serverURI;
 
 	public SoapClient(URI uri) {
-		this.uri = uri;
+		this.serverURI = uri;
 	}
 
 	protected void setTimeouts(BindingProvider port) {
@@ -48,14 +48,14 @@ abstract class SoapClient {
 		port.getRequestContext().put(BindingProviderProperties.REQUEST_TIMEOUT, READ_TIMEOUT);
 	}
 
-	protected <T> Result<T> reTry(ResultSupplier<Result<T>> func) {
+	protected <T> Result<T> retry(ResultSupplier<Result<T>> func) {
 		for (int i = 0; i < MAX_RETRIES; i++)
 			try {
 				return func.get();
 			} catch (WebServiceException x) {
 				x.printStackTrace();
 				Log.fine("Timeout: " + x.getMessage());
-				sleep_ms(RETRY_SLEEP);
+				sleep(RETRY_SLEEP);
 			} catch (Exception x) {
 				x.printStackTrace();
 				return Result.error(ErrorCode.INTERNAL_ERROR);
@@ -102,7 +102,7 @@ abstract class SoapClient {
 
 	@Override
 	public String toString() {
-		return uri.toString();
+		return serverURI.toString();
 	}
 
 	public static URL toURL(String url) {
@@ -114,7 +114,7 @@ abstract class SoapClient {
 		return null;
 	}
 
-	private void sleep_ms(int ms) {
+	private void sleep(int ms) {
 		try {
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {

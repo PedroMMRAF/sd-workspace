@@ -1,7 +1,9 @@
-package trab1.clients.rest.users;
+package trab1.clients.users;
 
 import trab1.api.User;
+import trab1.api.java.Result;
 import trab1.clients.ArgChecker;
+import trab1.clients.UsersClientFactory;
 
 public class CreateUserClient {
     public static void main(String[] args) throws InterruptedException {
@@ -18,8 +20,8 @@ public class CreateUserClient {
 
         System.out.println("Sending request to server.");
 
-        String result = new RestUsersClient(domain).createUser(user);
+        Result<String> result = UsersClientFactory.get(domain).createUser(user);
 
-        System.out.printf("Created user with name %s\n", result);
+        System.out.println(result);
     }
 }

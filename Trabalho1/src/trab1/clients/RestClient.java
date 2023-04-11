@@ -1,6 +1,5 @@
 package trab1.clients;
 
-import java.net.URI;
 import java.util.logging.Logger;
 import java.util.function.Supplier;
 
@@ -11,8 +10,6 @@ import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.ClientBuilder;
 
-import trab1.Discovery;
-
 public class RestClient {
     private static Logger Log = Logger.getLogger(RestClient.class.getName());
 
@@ -22,15 +19,10 @@ public class RestClient {
     protected static final int RETRY_SLEEP = 3000;
     protected static final int MAX_RETRIES = 10;
 
-    protected final URI serverURI;
     protected final Client client;
     protected final ClientConfig config;
 
-    public RestClient(String domain, String service) {
-        String serverURL = Discovery.getInstance().knownUrisOf(domain, service, 1)[0].toString();
-        Discovery.getInstance().kill();
-
-        this.serverURI = URI.create(serverURL);
+    public RestClient() {
         this.config = new ClientConfig();
 
         this.config.property(ClientProperties.READ_TIMEOUT, READ_TIMEOUT);

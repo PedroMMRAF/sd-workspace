@@ -5,6 +5,8 @@ import java.util.List;
 import trab1.api.User;
 
 public interface Users {
+	public static final String NAME = "users";
+
 	Result<String> createUser(User user);
 
 	Result<User> getUser(String name, String pwd);

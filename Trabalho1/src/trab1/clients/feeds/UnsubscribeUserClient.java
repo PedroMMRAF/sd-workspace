@@ -1,25 +1,26 @@
-package trab1.clients.rest.feeds;
+package trab1.clients.feeds;
 
-public class RemoveFromPersonalFeed {
+import trab1.clients.ArgChecker;
+import trab1.clients.FeedsClientFactory;
+
+public class UnsubscribeUserClient {
     static {
         System.setProperty("java.net.preferIPv4Stack", "true");
         System.setProperty("java.util.logging.SimpleFormatter.format", "%4$s: %5$s\n");
     }
 
     public static void main(String[] args) throws InterruptedException {
-        if (args.length != 4) {
-            System.err.println(
-                    "Use: java trab1.client.users.CreateUserClient user mid pwd");
-            return;
-        }
+        new ArgChecker(GetMessageClient.class)
+                .setParams("domain", "user", "mid", "pwd").check(args);
 
         String domain = args[0];
         String user = args[1];
-        long mid = Long.parseLong(args[2]);
+        String userSub = args[2];
         String pwd = args[3];
 
         System.out.println("Sending request to server.");
 
-        new RestFeedsClient(domain).removeFromPersonalFeed(user, mid, pwd);
+        System.out.println(FeedsClientFactory.get(domain).unsubscribeUser(user, userSub, pwd));
     }
+
 }

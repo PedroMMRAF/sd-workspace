@@ -1,9 +1,11 @@
-package trab1.clients.rest.users;
+package trab1.clients.users;
 
 import java.util.List;
 
 import trab1.api.User;
+import trab1.api.java.Result;
 import trab1.clients.ArgChecker;
+import trab1.clients.UsersClientFactory;
 
 public class SearchUserClient {
     public static void main(String[] args) throws InterruptedException {
@@ -16,10 +18,13 @@ public class SearchUserClient {
 
         System.out.println("Sending request to server.");
 
-        List<User> usrs = new RestUsersClient(domain).searchUsers(pattern);
+        Result<List<User>> result = UsersClientFactory.get(domain).searchUsers(pattern);
 
-        System.out.println("Users:");
+        if (!result.isOK()) {
+            System.out.println(result);
+            return;
+        }
 
-        usrs.forEach((u) -> System.out.printf("- %s", u));
+        result.value().forEach((u) -> System.out.printf("%s", u));
     }
 }

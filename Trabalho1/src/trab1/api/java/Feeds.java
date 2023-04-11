@@ -6,6 +6,8 @@ import trab1.api.Message;
 import trab1.api.User;
 
 public interface Feeds {
+    public static final String NAME = "feeds";
+
     Result<Long> postMessage(String user, String pwd, Message msg);
 
     Result<Long> postMessageOtherDomain(String user, Message msg);

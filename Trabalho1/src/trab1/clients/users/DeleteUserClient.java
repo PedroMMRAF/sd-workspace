@@ -1,11 +1,13 @@
-package trab1.clients.rest.users;
+package trab1.clients.users;
 
 import trab1.api.User;
+import trab1.api.java.Result;
 import trab1.clients.ArgChecker;
+import trab1.clients.UsersClientFactory;
 
-public class GetUserClient {
+public class DeleteUserClient {
     public static void main(String[] args) throws InterruptedException {
-        new ArgChecker(GetUserClient.class)
+        new ArgChecker(DeleteUserClient.class)
                 .setParams("domain", "name", "pwd")
                 .check(args);
 
@@ -15,8 +17,8 @@ public class GetUserClient {
 
         System.out.println("Sending request to server.");
 
-        User user = new RestUsersClient(domain).getUser(name, pwd);
+        Result<User> result = UsersClientFactory.get(domain).deleteUser(name, pwd);
 
-        System.out.println(user);
+        System.out.println(result);
     }
 }

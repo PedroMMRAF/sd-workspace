@@ -9,32 +9,30 @@ import trab1.api.Message;
 import trab1.api.User;
 import trab1.api.java.Feeds;
 import trab1.api.java.Result;
-import trab1.api.java.Users;
 import trab1.api.rest.FeedsService;
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 
 public class SoapFeedsClient extends SoapClient implements Feeds {
+	private FeedsService stub;
 
 	public SoapFeedsClient(URI serverURI) {
 		super(serverURI);
 	}
 
-	private FeedsService stub;
-
 	synchronized private FeedsService stub() {
 		if (stub == null) {
 			QName QNAME = new QName(FeedsService.NAMESPACE, FeedsService.PATH);
-			Service service = Service.create(super.toURL(super.uri + WSDL), QNAME);
-			this.stub = service.getPort(trab1.api.rest.FeedsService.class);
-			super.setTimeouts((BindingProvider) stub);
+			Service service = Service.create(toURL(serverURI + WSDL), QNAME);
+			stub = service.getPort(trab1.api.rest.FeedsService.class);
+			setTimeouts((BindingProvider) stub);
 		}
 		return stub;
 	}
 
 	@Override
 	public Result<Long> postMessage(String user, String pwd, Message msg) {
-		return super.reTry(() -> super.toJavaResult(() -> stub().postMessage(user, pwd, msg)));
+		return retry(() -> toJavaResult(() -> stub().postMessage(user, pwd, msg)));
 	}
 
 	@Override
@@ -44,22 +42,32 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
 
 	@Override
 	public Result<Void> removeFromPersonalFeed(String user, long mid, String pwd) {
-		return super.reTry(() -> super.toJavaResult(() -> stub().removeFromPersonalFeed(user, mid, pwd)));
+		return retry(() -> toJavaResult(() -> stub().removeFromPersonalFeed(user, mid, pwd)));
 	}
 
 	@Override
 	public Result<Message> getMessage(String user, long mid) {
-		return super.reTry(() -> super.toJavaResult(() -> stub().getMessage(user, mid)));
+		return retry(() -> toJavaResult(() -> stub().getMessage(user, mid)));
 	}
 
 	@Override
 	public Result<List<Message>> getMessages(String user, long time) {
-		return super.reTry(() -> super.toJavaResult(() -> stub().getMessages(user, time)));
+		return retry(() -> toJavaResult(() -> stub().getMessages(user, time)));
 	}
 
 	@Override
 	public Result<Void> subUser(String user, String userSub, String pwd) {
-		return super.reTry(() -> super.toJavaResult(() -> stub().subUser(user, userSub, pwd)));
+		return retry(() -> toJavaResult(() -> stub().subUser(user, userSub, pwd)));
+	}
+
+	@Override
+	public Result<Void> unsubscribeUser(String user, String userSub, String pwd) {
+		return retry(() -> toJavaResult(() -> stub().unsubscribeUser(user, userSub, pwd)));
+	}
+
+	@Override
+	public Result<List<String>> listSubs(String user) {
+		return retry(() -> toJavaResult(() -> stub().listSubs(user)));
 	}
 
 	@Override
@@ -68,18 +76,8 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
 	}
 
 	@Override
-	public Result<Void> unsubscribeUser(String user, String userSub, String pwd) {
-		return super.reTry(() -> super.toJavaResult(() -> stub().unsubscribeUser(user, userSub, pwd)));
-	}
-
-	@Override
 	public Result<Void> unsubUserOtherDomain(String user, String userSub) {
 		throw new UnsupportedOperationException("Unimplemented method 'unsubUserOtherDomain'");
-	}
-
-	@Override
-	public Result<List<String>> listSubs(String user) {
-		return super.reTry(() -> super.toJavaResult(() -> stub().listSubs(user)));
 	}
 
 	@Override

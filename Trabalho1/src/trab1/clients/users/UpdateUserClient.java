@@ -1,7 +1,9 @@
-package trab1.clients.rest.users;
+package trab1.clients.users;
 
 import trab1.api.User;
+import trab1.api.java.Result;
 import trab1.clients.ArgChecker;
+import trab1.clients.UsersClientFactory;
 
 public class UpdateUserClient {
     public static void main(String[] args) throws InterruptedException {
@@ -19,8 +21,8 @@ public class UpdateUserClient {
 
         System.out.println("Sending request to server.");
 
-        user = new RestUsersClient(domain).updateUser(name, pwd, user);
+        Result<User> result = UsersClientFactory.get(domain).updateUser(name, pwd, user);
 
-        System.out.printf("Updated %s", user);
+        System.out.println(result);
     }
 }
