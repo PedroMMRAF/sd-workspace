@@ -40,4 +40,9 @@ public class RestUsersResource extends RestResource implements UsersService {
     synchronized public List<User> searchUsers(String pattern) {
         return fromJavaResult(impl.searchUsers(pattern));
     }
+
+    @Override
+    public boolean hasUser(String name) {
+        return fromJavaResult(impl.hasUser(name));
+    }
 }

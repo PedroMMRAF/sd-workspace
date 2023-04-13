@@ -6,6 +6,7 @@ import trab1.api.java.Users;
 import trab1.api.rest.UsersService;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -26,7 +27,7 @@ public class RestUsersClient extends RestClient implements Users {
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.json(user));
 
-        return Result.fromResponse(r);
+        return Result.fromResponse(r, String.class);
     }
 
     private Result<User> clt_getUser(String name, String pwd) {
@@ -36,7 +37,7 @@ public class RestUsersClient extends RestClient implements Users {
                 .accept(MediaType.APPLICATION_JSON)
                 .get();
 
-        return Result.fromResponse(r);
+        return Result.fromResponse(r, User.class);
     }
 
     private Result<User> clt_updateUser(String name, String pwd, User user) {
@@ -46,7 +47,7 @@ public class RestUsersClient extends RestClient implements Users {
                 .accept(MediaType.APPLICATION_JSON)
                 .put(Entity.json(user));
 
-        return Result.fromResponse(r);
+        return Result.fromResponse(r, User.class);
     }
 
     private Result<User> clt_deleteUser(String name, String pwd) {
@@ -56,7 +57,7 @@ public class RestUsersClient extends RestClient implements Users {
                 .accept(MediaType.APPLICATION_JSON)
                 .delete();
 
-        return Result.fromResponse(r);
+        return Result.fromResponse(r, User.class);
     }
 
     private Result<List<User>> clt_searchUsers(String pattern) {
@@ -65,7 +66,17 @@ public class RestUsersClient extends RestClient implements Users {
                 .accept(MediaType.APPLICATION_JSON)
                 .get();
 
-        return Result.fromResponse(r);
+        return Result.fromResponse(r, new GenericType<List<User>>() {
+        });
+    }
+
+    private Result<Boolean> cls_hasUsers(String name) {
+        Response r = target.path("exists").path(name)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
+
+        return Result.fromResponse(r, Boolean.class);
     }
 
     @Override
@@ -91,5 +102,10 @@ public class RestUsersClient extends RestClient implements Users {
     @Override
     public Result<List<User>> searchUsers(String pattern) {
         return retry(() -> clt_searchUsers(pattern));
+    }
+
+    @Override
+    public Result<Boolean> hasUser(String name) {
+        return retry(() -> cls_hasUsers(name));
     }
 }

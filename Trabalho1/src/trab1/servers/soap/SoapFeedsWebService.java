@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import trab1.api.Message;
 import trab1.api.soap.FeedsException;
 import trab1.api.soap.FeedsService;
+import trab1.servers.java.JavaFeeds;
 import trab1.api.java.Feeds;
 import jakarta.jws.WebService;
 
@@ -18,7 +19,7 @@ public class SoapFeedsWebService extends SoapWebService<FeedsException> implemen
 
 	public SoapFeedsWebService() {
 		super((result) -> new FeedsException(result.error().toString()));
-		this.impl = new SoapFeeds();
+		this.impl = new JavaFeeds();
 	}
 
 	@Override

@@ -70,4 +70,13 @@ public interface UsersService {
 	@WebMethod
 	List<User> searchUsers(String pattern) throws UsersException;
 
+	/**
+	 * Returns the state of existance of a user
+	 * 
+	 * @param pattern substring to search
+	 * @return true if the user exists, false otherwise
+	 * @throws UsersException otherwise
+	 */
+	@WebMethod
+	boolean hasUser(String name) throws UsersException;
 }

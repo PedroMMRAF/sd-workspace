@@ -12,9 +12,11 @@ import trab1.api.Message;
 import trab1.api.User;
 import trab1.api.java.Feeds;
 import trab1.api.java.Result;
+import trab1.clients.FeedsClientFactory;
+import trab1.clients.UsersClientFactory;
 import trab1.servers.Domain;
 
-public abstract class JavaFeeds implements Feeds {
+public class JavaFeeds implements Feeds {
     private static Logger Log = Logger.getLogger(JavaFeeds.class.getName());
 
     private Map<String, Map<Long, Message>> feeds;
@@ -65,7 +67,6 @@ public abstract class JavaFeeds implements Feeds {
 
         getFeed(user).put(id, msg);
 
-        // TODO: Dar fix a esta merda
         for (String u : getFollowers(user)) {
             String subDomain = u.split("@")[1];
 
@@ -112,7 +113,7 @@ public abstract class JavaFeeds implements Feeds {
         if (!domain.equals(Domain.get()))
             return forwardGetMessage(user, mid);
 
-        if (!hasUser(user))
+        if (!hasUser(user).value())
             return Result.error(Result.ErrorCode.NOT_FOUND);
 
         Message msg = getFeed(user).get(mid);
@@ -132,7 +133,7 @@ public abstract class JavaFeeds implements Feeds {
         if (!domain.equals(Domain.get()))
             return forwardGetMessages(user, time);
 
-        if (!hasUser(user))
+        if (!hasUser(user).value())
             return Result.error(Result.ErrorCode.NOT_FOUND);
 
         return Result.ok(getFeed(user).values().stream()
@@ -147,7 +148,7 @@ public abstract class JavaFeeds implements Feeds {
 
         String subDomain = userSub.split("@")[1];
 
-        if (!hasUser(userSub))
+        if (!hasUser(userSub).value())
             return Result.error(Result.ErrorCode.NOT_FOUND);
 
         if (!subDomain.equals(Domain.get()))
@@ -177,7 +178,7 @@ public abstract class JavaFeeds implements Feeds {
 
         String subDomain = userSub.split("@")[1];
 
-        if (!hasUser(userSub))
+        if (!hasUser(userSub).value())
             return Result.error(Result.ErrorCode.NOT_FOUND);
 
         if (!subDomain.equals(Domain.get()))
@@ -203,9 +204,65 @@ public abstract class JavaFeeds implements Feeds {
     public Result<List<String>> listSubs(String user) {
         Log.info("listSubs : " + user);
 
-        if (!hasUser(user))
+        if (!hasUser(user).value())
             return Result.error(Result.ErrorCode.NOT_FOUND);
 
         return Result.ok(getFollowing(user).stream().toList());
+    }
+
+    @Override
+    public Result<User> getUser(String user, String pwd) {
+        Log.info("getUser : " + user);
+
+        String[] userInfo = user.split("@");
+        return UsersClientFactory.get(userInfo[1]).getUser(userInfo[0], pwd);
+    }
+
+    @Override
+    public Result<Boolean> hasUser(String user) {
+        Log.info("hasUser : " + user);
+
+        String[] userInfo = user.split("@");
+        return UsersClientFactory.get(userInfo[1]).hasUser(userInfo[0]);
+    }
+
+    @Override
+    public Result<Long> postMessagePropagate(String user, Message msg) {
+        Log.info("postMessagePropagate : " + user);
+
+        String[] userInfo = user.split("@");
+        return FeedsClientFactory.get(userInfo[1]).postMessageOtherDomain(user, msg);
+    }
+
+    @Override
+    public Result<Void> subUserPropagate(String user, String userSub) {
+        Log.info("subUserPropagate : " + user);
+
+        String[] userInfo = user.split("@");
+        return FeedsClientFactory.get(userInfo[1]).subUserOtherDomain(user, userSub);
+    }
+
+    @Override
+    public Result<Void> unsubUserPropagate(String user, String userSub) {
+        Log.info("unsubUserPropagate : " + user);
+
+        String[] userInfo = user.split("@");
+        return FeedsClientFactory.get(userInfo[1]).unsubUserOtherDomain(user, userSub);
+    }
+
+    @Override
+    public Result<Message> forwardGetMessage(String user, long mid) {
+        Log.info("forwardGetMessage : " + user);
+
+        String[] userInfo = user.split("@");
+        return FeedsClientFactory.get(userInfo[1]).getMessage(user, mid);
+    }
+
+    @Override
+    public Result<List<Message>> forwardGetMessages(String user, long time) {
+        Log.info("forwardGetMessages : " + user);
+
+        String[] userInfo = user.split("@");
+        return FeedsClientFactory.get(userInfo[1]).getMessages(user, time);
     }
 }

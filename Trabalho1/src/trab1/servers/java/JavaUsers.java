@@ -110,4 +110,14 @@ public class JavaUsers implements Users {
                 .map(u -> u.withoutPassword())
                 .toList());
     }
+
+    @Override
+    public Result<Boolean> hasUser(String name) {
+        Log.info("hasUser : name = " + name);
+
+        if (name == null)
+            return Result.error(Result.ErrorCode.BAD_REQUEST);
+
+        return Result.ok(users.containsKey(name));
+    }
 }
