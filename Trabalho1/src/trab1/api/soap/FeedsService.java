@@ -8,7 +8,6 @@ import jakarta.jws.WebService;
 
 @WebService(serviceName = FeedsService.NAME, targetNamespace = FeedsService.NAMESPACE, endpointInterface = FeedsService.INTERFACE)
 public interface FeedsService {
-
 	static final String NAME = "feeds";
 	static final String NAMESPACE = "http://sd2223";
 	static final String INTERFACE = "trab1.api.soap.FeedsService";
@@ -21,8 +20,6 @@ public interface FeedsService {
 	String LIST = "list";
 	String USERSUB = "userSub";
 	String PROPAGATE = "propagate";
-
-
 
 	/**
 	 * Posts a new message in the feed, associating it to the feed of the specific
@@ -41,7 +38,7 @@ public interface FeedsService {
 	 *         400 otherwise
 	 */
 	@WebMethod
-	long postMessage(String user,String pwd, Message msg) throws FeedsException;
+	long postMessage(String user, String pwd, Message msg) throws FeedsException;
 
 	/**
 	 * Posts a new message in the feed, associating it to the feed of the specific
@@ -76,7 +73,7 @@ public interface FeedsService {
 	 *         the user does not exist
 	 */
 	@WebMethod
-	void removeFromPersonalFeed(String user,long mid, String pwd) throws FeedsException;
+	void removeFromPersonalFeed(String user, long mid, String pwd) throws FeedsException;
 
 	/**
 	 * Obtains the message with id from the feed of user (may be a remote user)
@@ -154,7 +151,7 @@ public interface FeedsService {
 	 *         404 is generated if the userSub is not subscribed
 	 */
 	@WebMethod
-	void unsubscribeUser(String user,String userSub,String pwd) throws FeedsException;
+	void unsubscribeUser(String user, String userSub, String pwd) throws FeedsException;
 
 	/**
 	 * Unsubscribe a user from another domain.
@@ -171,7 +168,7 @@ public interface FeedsService {
 	 *         correct
 	 */
 	@WebMethod
-	void unsubUserOtherDomain( String user,  String userSub) throws FeedsException;
+	void unsubUserOtherDomain(String user, String userSub) throws FeedsException;
 
 	/**
 	 * Subscribed users.
@@ -183,5 +180,3 @@ public interface FeedsService {
 	@WebMethod
 	List<String> listSubs(String user) throws FeedsException;
 }
-
-
