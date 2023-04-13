@@ -1,5 +1,6 @@
 package trab1.clients.users;
 
+import trab1.Discovery;
 import trab1.api.User;
 import trab1.api.java.Result;
 import trab1.clients.ArgChecker;
@@ -24,5 +25,7 @@ public class UpdateUserClient {
         Result<User> result = UsersClientFactory.get(domain).updateUser(name, pwd, user);
 
         System.out.println(result);
+
+        Discovery.getInstance().kill();
     }
 }

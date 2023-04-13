@@ -44,6 +44,24 @@ public class JavaFeeds implements Feeds {
         return followers.get(user);
     }
 
+    private static void logInfo(String name, Object... pairs) {
+        StringBuilder result = new StringBuilder("Feeds : ");
+
+        result.append(name);
+        result.append(" : ");
+
+        for (int i = 0; i < pairs.length; i += 2) {
+            result.append(pairs[i]);
+            result.append(" = ");
+            result.append(pairs[i + 1]);
+
+            if (i < pairs.length - 2)
+                result.append(", ");
+        }
+
+        Log.info(result.toString());
+    }
+
     @Override
     public Result<Long> postMessage(String user, String pwd, Message msg) {
         String userDomain = user.split("@")[1];
@@ -58,7 +76,7 @@ public class JavaFeeds implements Feeds {
         long id = UUID.randomUUID().getMostSignificantBits();
         msg.setId(id);
 
-        Log.info("postMessage : " + msg);
+        logInfo("postMessage", "user", user, "pwd", pwd, "msg", msg);
 
         Result<User> res = getUser(user, pwd);
 
@@ -82,7 +100,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<Long> postMessageOtherDomain(String user, Message msg) {
-        Log.info("postMessageOtherDomain : " + msg);
+        logInfo("postMessageOtherDomain", "user", user, "msg", msg);
 
         getFeed(user).put(msg.getId(), msg);
 
@@ -91,7 +109,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<Void> removeFromPersonalFeed(String user, long mid, String pwd) {
-        Log.info("removeFromPersonalFeed : " + mid);
+        logInfo("postMessageOtherDomain", "user", user, "mid", mid, "pwd", pwd);
 
         Result<User> res = getUser(user, pwd);
 
@@ -106,7 +124,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<Message> getMessage(String user, long mid) {
-        Log.info("getMessage : " + mid);
+        logInfo("getMessage", "user", user, "mid", mid);
 
         String domain = user.split("@")[1];
 
@@ -126,7 +144,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<List<Message>> getMessages(String user, long time) {
-        Log.info("getMessages : " + time);
+        logInfo("getMessages", "user", user, "time", time);
 
         String domain = user.split("@")[1];
 
@@ -137,12 +155,12 @@ public class JavaFeeds implements Feeds {
             return Result.error(Result.ErrorCode.NOT_FOUND);
 
         return Result.ok(getFeed(user).values().stream()
-                .filter((e) -> e.getCreationTime() > time).toList());
+                .filter(m -> m.getCreationTime() > time).toList());
     }
 
     @Override
     public Result<Void> subUser(String user, String userSub, String pwd) {
-        Log.info("subUser : " + user + ", " + userSub);
+        logInfo("subUser", "user", user, "userSub", userSub, "pwd", pwd);
 
         getUser(user, pwd);
 
@@ -162,7 +180,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<Void> subUserOtherDomain(String user, String userSub) {
-        Log.info("subUserOtherDomain : " + user + ", " + userSub);
+        logInfo("subUserOtherDomain", "user", user, "userSub", userSub);
 
         getFollowing(user).add(userSub);
         getFollowers(userSub).add(user);
@@ -172,7 +190,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<Void> unsubscribeUser(String user, String userSub, String pwd) {
-        Log.info("unsubscribeUser : " + user + ", " + userSub);
+        logInfo("unsubscribeUser", "user", user, "userSub", userSub, "pwd", pwd);
 
         getUser(user, pwd);
 
@@ -192,7 +210,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<Void> unsubUserOtherDomain(String user, String userSub) {
-        Log.info("unsubUserOtherDomain : " + user + ", " + userSub);
+        logInfo("unsubUserOtherDomain", "user", user, "userSub", userSub);
 
         getFollowing(user).remove(userSub);
         getFollowers(userSub).remove(user);
@@ -202,7 +220,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<List<String>> listSubs(String user) {
-        Log.info("listSubs : " + user);
+        logInfo("listSubs", "user", user);
 
         if (!hasUser(user).value())
             return Result.error(Result.ErrorCode.NOT_FOUND);
@@ -212,7 +230,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<User> getUser(String user, String pwd) {
-        Log.info("getUser : " + user);
+        logInfo("getUser", "user", user, "pwd", pwd);
 
         String[] userInfo = user.split("@");
         return UsersClientFactory.get(userInfo[1]).getUser(userInfo[0], pwd);
@@ -220,7 +238,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<Boolean> hasUser(String user) {
-        Log.info("hasUser : " + user);
+        logInfo("hasUser", "user", user);
 
         String[] userInfo = user.split("@");
         return UsersClientFactory.get(userInfo[1]).hasUser(userInfo[0]);
@@ -228,7 +246,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<Long> postMessagePropagate(String user, Message msg) {
-        Log.info("postMessagePropagate : " + user);
+        logInfo("postMessagePropagate", "user", user, "msg", msg);
 
         String[] userInfo = user.split("@");
         return FeedsClientFactory.get(userInfo[1]).postMessageOtherDomain(user, msg);
@@ -236,23 +254,23 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<Void> subUserPropagate(String user, String userSub) {
-        Log.info("subUserPropagate : " + user);
+        logInfo("subUserPropagate", "user", user, "msg", userSub);
 
-        String[] userInfo = user.split("@");
-        return FeedsClientFactory.get(userInfo[1]).subUserOtherDomain(user, userSub);
+        String subDomain = userSub.split("@")[1];
+        return FeedsClientFactory.get(subDomain).subUserOtherDomain(user, userSub);
     }
 
     @Override
     public Result<Void> unsubUserPropagate(String user, String userSub) {
-        Log.info("unsubUserPropagate : " + user);
+        logInfo("unsubUserPropagate", "user", user, "msg", userSub);
 
-        String[] userInfo = user.split("@");
-        return FeedsClientFactory.get(userInfo[1]).unsubUserOtherDomain(user, userSub);
+        String subDomain = userSub.split("@")[1];
+        return FeedsClientFactory.get(subDomain).unsubUserOtherDomain(user, userSub);
     }
 
     @Override
     public Result<Message> forwardGetMessage(String user, long mid) {
-        Log.info("forwardGetMessage : " + user);
+        logInfo("forwardGetMessage", "user", user, "mid", mid);
 
         String[] userInfo = user.split("@");
         return FeedsClientFactory.get(userInfo[1]).getMessage(user, mid);
@@ -260,7 +278,7 @@ public class JavaFeeds implements Feeds {
 
     @Override
     public Result<List<Message>> forwardGetMessages(String user, long time) {
-        Log.info("forwardGetMessages : " + user);
+        logInfo("forwardGetMessages", "user", user, "time", time);
 
         String[] userInfo = user.split("@");
         return FeedsClientFactory.get(userInfo[1]).getMessages(user, time);

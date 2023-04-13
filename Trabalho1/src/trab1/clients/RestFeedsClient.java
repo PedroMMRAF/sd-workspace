@@ -33,6 +33,15 @@ public class RestFeedsClient extends RestClient implements Feeds {
         return Result.fromResponse(r, Long.class);
     }
 
+    public Result<Long> clt_postMessageOtherDomain(String user, Message msg) {
+        Response r = target.path("propagate").path(user)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.json(msg));
+
+        return Result.fromResponse(r, Long.class);
+    }
+
     public Result<Void> clt_removeFromPersonalFeed(String user, long mid, String pwd) {
         Response r = target.path(user).path(Long.toString(mid))
                 .queryParam(FeedsService.PWD, pwd)
@@ -68,10 +77,28 @@ public class RestFeedsClient extends RestClient implements Feeds {
         return Result.fromResponse(r);
     }
 
+    private Result<Void> clt_subUserOtherDomain(String user, String userSub) {
+        Response r = target.path("propagate").path(user).path(userSub)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.json(null));
+
+        return Result.fromResponse(r);
+    }
+
     public Result<Void> clt_unsubscribeUser(String user, String userSub, String pwd) {
         Response r = target.path("sub").path(user).path(userSub)
                 .queryParam(FeedsService.PWD, pwd)
                 .request().accept(MediaType.APPLICATION_JSON).delete();
+
+        return Result.fromResponse(r);
+    }
+
+    private Result<Void> clt_unsubUserOtherDomain(String user, String userSub) {
+        Response r = target.path("propagate").path(user).path(userSub)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .delete();
 
         return Result.fromResponse(r);
     }
@@ -85,36 +112,14 @@ public class RestFeedsClient extends RestClient implements Feeds {
         });
     }
 
-    public Result<Long> clt_postMessageOtherDomain(String user, Message msg) {
-        Response r = target.path("propagate").path(user)
-                .request()
-                .accept(MediaType.APPLICATION_JSON)
-                .post(Entity.json(msg));
-
-        return Result.fromResponse(r, Long.class);
-    }
-
-    private Result<Void> clt_subUserOtherDomain(String user, String userSub) {
-        Response r = target.path("propagate").path("sub").path(user).path(userSub)
-                .request()
-                .accept(MediaType.APPLICATION_JSON)
-                .post(Entity.json(null));
-
-        return Result.fromResponse(r);
-    }
-
-    private Result<Void> clt_unsubUserOtherDomain(String user, String userSub) {
-        Response r = target.path("propagate").path("sub").path(user).path(userSub)
-                .request()
-                .accept(MediaType.APPLICATION_JSON)
-                .delete();
-
-        return Result.fromResponse(r);
-    }
-
     @Override
     public Result<Long> postMessage(String user, String pwd, Message msg) {
         return retry(() -> clt_postMessage(user, pwd, msg));
+    }
+
+    @Override
+    public Result<Long> postMessageOtherDomain(String user, Message msg) {
+        return retry(() -> clt_postMessageOtherDomain(user, msg));
     }
 
     @Override
@@ -138,28 +143,23 @@ public class RestFeedsClient extends RestClient implements Feeds {
     }
 
     @Override
-    public Result<Void> unsubscribeUser(String user, String userSub, String pwd) {
-        return retry(() -> clt_unsubscribeUser(user, userSub, pwd));
-    }
-
-    @Override
-    public Result<List<String>> listSubs(String user) {
-        return retry(() -> clt_listSubs(user));
-    }
-
-    @Override
-    public Result<Long> postMessageOtherDomain(String user, Message msg) {
-        return retry(() -> clt_postMessageOtherDomain(user, msg));
-    }
-
-    @Override
     public Result<Void> subUserOtherDomain(String user, String userSub) {
         return retry(() -> clt_subUserOtherDomain(user, userSub));
     }
 
     @Override
+    public Result<Void> unsubscribeUser(String user, String userSub, String pwd) {
+        return retry(() -> clt_unsubscribeUser(user, userSub, pwd));
+    }
+
+    @Override
     public Result<Void> unsubUserOtherDomain(String user, String userSub) {
         return retry(() -> clt_unsubUserOtherDomain(user, userSub));
+    }
+
+    @Override
+    public Result<List<String>> listSubs(String user) {
+        return retry(() -> clt_listSubs(user));
     }
 
     // Unimplemented on client
