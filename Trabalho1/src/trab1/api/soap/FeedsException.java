@@ -3,14 +3,14 @@ package trab1.api.soap;
 import jakarta.xml.ws.WebFault;
 
 @WebFault
-public class UsersException extends Exception {
+public class FeedsException extends Exception {
 
 
-	public UsersException() {
+	public FeedsException() {
 		super("");
 	}
 
-	public UsersException(String errorMessage ) {
+	public FeedsException(String errorMessage ) {
 		super(errorMessage);
 	}
 	
