@@ -38,7 +38,7 @@ public class JavaUsers implements Users {
     }
 
     @Override
-    synchronized public Result<String> createUser(User user) {
+    public Result<String> createUser(User user) {
         logInfo("createUser", "user", user);
 
         if (user == null
@@ -58,7 +58,7 @@ public class JavaUsers implements Users {
     }
 
     @Override
-    synchronized public Result<User> getUser(String name, String pwd) {
+    public Result<User> getUser(String name, String pwd) {
         logInfo("getUser", "name", name, "pwd", pwd);
 
         if (name == null || pwd == null)
@@ -76,7 +76,7 @@ public class JavaUsers implements Users {
     }
 
     @Override
-    synchronized public Result<User> updateUser(String name, String pwd, User newUser) {
+    public Result<User> updateUser(String name, String pwd, User newUser) {
         logInfo("updateUser", "name", name, "pwd", pwd, "newUser", newUser);
 
         if (newUser == null)
@@ -103,7 +103,7 @@ public class JavaUsers implements Users {
     }
 
     @Override
-    synchronized public Result<User> deleteUser(String name, String pwd) {
+    public Result<User> deleteUser(String name, String pwd) {
         logInfo("deleteUser", "name", name, "pwd", pwd);
 
         Result<User> res = getUser(name, pwd);
@@ -117,7 +117,7 @@ public class JavaUsers implements Users {
     }
 
     @Override
-    synchronized public Result<List<User>> searchUsers(String pattern) {
+    public Result<List<User>> searchUsers(String pattern) {
         logInfo("searchUsers", "pattern", pattern);
 
         if (pattern == null)
