@@ -12,15 +12,6 @@ public interface FeedsService {
 	static final String NAMESPACE = "http://sd2223";
 	static final String INTERFACE = "trab1.api.soap.FeedsService";
 
-	String MID = "mid";
-	String PWD = "pwd";
-	String SUB = "sub";
-	String USER = "user";
-	String TIME = "time";
-	String LIST = "list";
-	String USERSUB = "userSub";
-	String PROPAGATE = "propagate";
-
 	/**
 	 * Posts a new message in the feed, associating it to the feed of the specific
 	 * user.
@@ -32,10 +23,7 @@ public interface FeedsService {
 	 * @param user user of the operation (format user@domain)
 	 * @param pwd  password of the user sending the message
 	 * @param msg  the message object to be posted to the server
-	 * @return 200 the unique numerical identifier for the posted message;
-	 *         403 if the publisher does not exist in the current domain or if the
-	 *         pwd is not correct
-	 *         400 otherwise
+	 * @throws FeedsException otherwise
 	 */
 	@WebMethod
 	long postMessage(String user, String pwd, Message msg) throws FeedsException;
@@ -50,10 +38,7 @@ public interface FeedsService {
 	 *
 	 * @param user user of the operation (format user@domain)
 	 * @param msg  the message object to be posted to the server
-	 * @return 200 the unique numerical identifier for the posted message;
-	 *         404 if the publisher does not exist in the current domain
-	 *         403 if the pwd is not correct
-	 *         400 otherwise
+	 * @throws FeedsException otherwise
 	 */
 	@WebMethod
 	long postMessageOtherDomain(String user, Message msg) throws FeedsException;
@@ -67,10 +52,7 @@ public interface FeedsService {
 	 * @param user user feed being accessed (format user@domain)
 	 * @param mid  the identifier of the message to be deleted
 	 * @param pwd  password of the user
-	 * @return 204 if ok
-	 *         403 if the pwd is not correct
-	 *         404 is generated if the message does not exist in the server or if
-	 *         the user does not exist
+	 * @throws FeedsException otherwise
 	 */
 	@WebMethod
 	void removeFromPersonalFeed(String user, long mid, String pwd) throws FeedsException;
@@ -80,9 +62,7 @@ public interface FeedsService {
 	 * 
 	 * @param user user feed being accessed (format user@domain)
 	 * @param mid  id of the message
-	 *
-	 * @return 200 the message if it exists;
-	 *         404 if the user or the message does not exists
+	 * @throws FeedsException otherwise
 	 */
 	@WebMethod
 	Message getMessage(String user, long mid) throws FeedsException;
@@ -94,8 +74,7 @@ public interface FeedsService {
 	 * 
 	 * @param user user feed being accessed (format user@domain)
 	 * @param time the oldest time of the messages to be returned
-	 * @return 200 a list of messages, potentially empty;
-	 *         404 if the user does not exist.
+	 * @throws FeedsException otherwise
 	 */
 	@WebMethod
 	List<Message> getMessages(String user, long time) throws FeedsException;
@@ -110,10 +89,7 @@ public interface FeedsService {
 	 *                user@domain)
 	 * @param userSub the user to be subscribed (followed) (format user@domain)
 	 * @param pwd     password of the user
-	 * @return 204 if ok
-	 *         404 is generated if the user to be subscribed does not exist
-	 *         403 is generated if the user does not exist or if the pwd is not
-	 *         correct
+	 * @throws FeedsException otherwise
 	 */
 	@WebMethod
 	void subUser(String user, String userSub, String pwd) throws FeedsException;
@@ -127,10 +103,7 @@ public interface FeedsService {
 	 * @param user    the user subscribing (following) other user (format
 	 *                user@domain)
 	 * @param userSub the user to be subscribed (followed) (format user@domain)
-	 * @return 204 if ok
-	 *         404 is generated if the user to be subscribed does not exist
-	 *         403 is generated if the user does not exist or if the pwd is not
-	 *         correct
+	 * @throws FeedsException otherwise
 	 */
 	@WebMethod
 	void subUserOtherDomain(String user, String userSub) throws FeedsException;
@@ -145,10 +118,7 @@ public interface FeedsService {
 	 *                user@domain)
 	 * @param userSub the identifier of the user to be unsubscribed
 	 * @param pwd     password of the user
-	 * @return 204 if ok
-	 *         403 is generated if the user does not exist or if the pwd is not
-	 *         correct
-	 *         404 is generated if the userSub is not subscribed
+	 * @throws FeedsException otherwise
 	 */
 	@WebMethod
 	void unsubscribeUser(String user, String userSub, String pwd) throws FeedsException;
@@ -162,10 +132,7 @@ public interface FeedsService {
 	 * @param user    the user subscribing (following) other user (format
 	 *                user@domain)
 	 * @param userSub the user to be subscribed (followed) (format user@domain)
-	 * @return 204 if ok
-	 *         404 is generated if the user to be subscribed does not exist
-	 *         403 is generated if the user does not exist or if the pwd is not
-	 *         correct
+	 * @throws FeedsException otherwise
 	 */
 	@WebMethod
 	void unsubUserOtherDomain(String user, String userSub) throws FeedsException;
@@ -174,8 +141,7 @@ public interface FeedsService {
 	 * Subscribed users.
 	 *
 	 * @param user user being accessed (format user@domain)
-	 * @return 200 if ok
-	 *         404 is generated if the user does not exist
+	 * @throws FeedsException otherwise
 	 */
 	@WebMethod
 	List<String> listSubs(String user) throws FeedsException;

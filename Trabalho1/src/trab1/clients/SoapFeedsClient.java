@@ -9,7 +9,7 @@ import trab1.api.Message;
 import trab1.api.User;
 import trab1.api.java.Feeds;
 import trab1.api.java.Result;
-import trab1.api.rest.FeedsService;
+import trab1.api.soap.FeedsService;
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 
@@ -22,9 +22,9 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
 
 	synchronized private FeedsService stub() {
 		if (stub == null) {
-			QName QNAME = new QName(FeedsService.NAMESPACE, FeedsService.PATH);
+			QName QNAME = new QName(FeedsService.NAMESPACE, FeedsService.NAME);
 			Service service = Service.create(toURL(serverURI + WSDL), QNAME);
-			stub = service.getPort(trab1.api.rest.FeedsService.class);
+			stub = service.getPort(trab1.api.soap.FeedsService.class);
 			setTimeouts((BindingProvider) stub);
 		}
 		return stub;
@@ -37,7 +37,7 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
 
 	@Override
 	public Result<Long> postMessageOtherDomain(String user, Message msg) {
-		throw new UnsupportedOperationException("Unimplemented method 'postMessageOtherDomain'");
+		return retry(() -> toJavaResult(() -> stub().postMessageOtherDomain(user, msg)));
 	}
 
 	@Override

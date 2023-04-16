@@ -8,7 +8,6 @@ import jakarta.jws.WebService;
 
 @WebService(serviceName = UsersService.NAME, targetNamespace = UsersService.NAMESPACE, endpointInterface = UsersService.INTERFACE)
 public interface UsersService {
-
 	static final String NAME = "users";
 	static final String NAMESPACE = "http://sd2223";
 	static final String INTERFACE = "trab1.api.soap.UsersService";

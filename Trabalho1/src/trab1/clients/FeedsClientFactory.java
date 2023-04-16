@@ -15,20 +15,21 @@ public class FeedsClientFactory {
 
 	public static Feeds get(String domain) {
 		URI serverURI = Discovery.getInstance().knownUrisOf(domain, Feeds.NAME, 1)[0];
+		String stringURI = serverURI.toString();
 
-		Feeds client = clients.get(serverURI.toString());
+		Feeds client = clients.get(stringURI);
 
 		if (client != null)
 			return client;
 
-		if (serverURI.toString().endsWith(REST))
+		if (stringURI.endsWith(REST))
 			client = new RestFeedsClient(serverURI);
-		else if (serverURI.toString().endsWith(SOAP))
+		else if (stringURI.endsWith(SOAP))
 			client = new SoapFeedsClient(serverURI);
 		else
-			throw new RuntimeException("Unknown service type... " + serverURI);
+			throw new RuntimeException("Unknown service type... " + stringURI);
 
-		clients.put(serverURI.toString(), client);
+		clients.put(stringURI, client);
 
 		return client;
 	}

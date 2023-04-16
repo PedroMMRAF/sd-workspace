@@ -1,6 +1,5 @@
 package trab1.servers.soap;
 
-
 import java.net.InetAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -9,7 +8,6 @@ import trab1.servers.Domain;
 import jakarta.xml.ws.Endpoint;
 
 public class SoapFeedsServer {
-
 	public static final int PORT = 8081;
 	public static final String SERVICE_NAME = "feeds";
 	public static String SERVER_BASE_URI = "http://%s:%s/soap";
@@ -17,18 +15,19 @@ public class SoapFeedsServer {
 	private static Logger Log = Logger.getLogger(SoapFeedsServer.class.getName());
 
 	public static void main(String[] args) throws Exception {
-
 		Domain.set(args[0]);
-		
-//		System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-//		System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
-//		System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
-//		System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
+
+		// System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump",
+		// "true");
+		// System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump",
+		// "true");
+		// System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
+		// System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump",
+		// "true");
 
 		Log.setLevel(Level.INFO);
 
 		String ip = InetAddress.getLocalHost().getHostAddress();
-		
 
 		String serverURI = String.format(SERVER_BASE_URI, ip, PORT);
 
@@ -36,6 +35,6 @@ public class SoapFeedsServer {
 
 		Log.info(String.format("%s Soap Server ready @ %s\n", SERVICE_NAME, serverURI));
 
-		Discovery.getInstance().announce(Domain.get(), SERVICE_NAME, ip);
+		Discovery.getInstance().announce(Domain.get(), SERVICE_NAME, serverURI);
 	}
 }
