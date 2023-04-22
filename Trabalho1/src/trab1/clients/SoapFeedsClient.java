@@ -20,7 +20,7 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
 		super(serverURI);
 	}
 
-	synchronized private FeedsService stub() {
+	private FeedsService stub() {
 		if (stub == null) {
 			QName QNAME = new QName(FeedsService.NAMESPACE, FeedsService.NAME);
 			Service service = Service.create(toURL(serverURI + WSDL), QNAME);
