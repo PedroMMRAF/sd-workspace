@@ -19,9 +19,27 @@ public class JavaUsers implements Users {
         users = new ConcurrentHashMap<>();
     }
 
+    private static void logInfo(String name, Object... pairs) {
+        StringBuilder result = new StringBuilder("Users : ");
+
+        result.append(name);
+        result.append(" : ");
+
+        for (int i = 0; i < pairs.length; i += 2) {
+            result.append(pairs[i]);
+            result.append(" = ");
+            result.append(pairs[i + 1]);
+
+            if (i < pairs.length - 2)
+                result.append(", ");
+        }
+
+        Log.info(result.toString());
+    }
+
     @Override
-    synchronized public Result<String> createUser(User user) {
-        Log.info("createUser : " + user);
+    public Result<String> createUser(User user) {
+        logInfo("createUser", "user", user);
 
         if (user == null
                 || user.getName() == null
@@ -40,8 +58,8 @@ public class JavaUsers implements Users {
     }
 
     @Override
-    synchronized public Result<User> getUser(String name, String pwd) {
-        Log.info("getUser : user = " + name + "; pwd = " + pwd);
+    public Result<User> getUser(String name, String pwd) {
+        logInfo("getUser", "name", name, "pwd", pwd);
 
         if (name == null || pwd == null)
             return Result.error(Result.ErrorCode.BAD_REQUEST);
@@ -58,8 +76,8 @@ public class JavaUsers implements Users {
     }
 
     @Override
-    synchronized public Result<User> updateUser(String name, String pwd, User newUser) {
-        Log.info("updateUser : name = " + name + "; pwd = " + pwd + " ; user = " + newUser);
+    public Result<User> updateUser(String name, String pwd, User newUser) {
+        logInfo("updateUser", "name", name, "pwd", pwd, "newUser", newUser);
 
         if (newUser == null)
             return Result.error(Result.ErrorCode.BAD_REQUEST);
@@ -85,8 +103,8 @@ public class JavaUsers implements Users {
     }
 
     @Override
-    synchronized public Result<User> deleteUser(String name, String pwd) {
-        Log.info("deleteUser : user = " + name + "; pwd = " + pwd);
+    public Result<User> deleteUser(String name, String pwd) {
+        logInfo("deleteUser", "name", name, "pwd", pwd);
 
         Result<User> res = getUser(name, pwd);
 
@@ -99,8 +117,8 @@ public class JavaUsers implements Users {
     }
 
     @Override
-    synchronized public Result<List<User>> searchUsers(String pattern) {
-        Log.info("searchUsers : pattern = " + pattern);
+    public Result<List<User>> searchUsers(String pattern) {
+        logInfo("searchUsers", "pattern", pattern);
 
         if (pattern == null)
             return Result.error(Result.ErrorCode.BAD_REQUEST);
@@ -109,5 +127,15 @@ public class JavaUsers implements Users {
                 .filter(u -> u.matchesPattern(pattern))
                 .map(u -> u.withoutPassword())
                 .toList());
+    }
+
+    @Override
+    public Result<Boolean> hasUser(String name) {
+        logInfo("hasUser", "name", name);
+
+        if (name == null)
+            return Result.error(Result.ErrorCode.BAD_REQUEST);
+
+        return Result.ok(users.containsKey(name));
     }
 }

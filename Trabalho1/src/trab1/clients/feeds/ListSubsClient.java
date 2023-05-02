@@ -1,5 +1,6 @@
 package trab1.clients.feeds;
 
+import trab1.Discovery;
 import trab1.clients.ArgChecker;
 import trab1.clients.FeedsClientFactory;
 
@@ -14,5 +15,7 @@ public class ListSubsClient {
         System.out.println("Sending request to server.");
 
         System.out.println(FeedsClientFactory.get(domain).listSubs(user));
+
+        Discovery.getInstance().kill();
     }
 }

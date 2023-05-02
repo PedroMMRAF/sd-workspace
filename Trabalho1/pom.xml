@@ -9,7 +9,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<authors>60694-60814</authors>
 	</properties>
-
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
@@ -44,7 +43,6 @@
 						</goals>
 					</execution>
 				</executions>
-
 				<configuration>
 					<images>
 						<image>
@@ -80,6 +78,11 @@
 			<version>4.0.2</version>
 		</dependency>
 		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>31.1-jre</version>
+		</dependency>
+		<dependency>
 			<groupId>jakarta.xml.ws</groupId>
 			<artifactId>jakarta.xml.ws-api</artifactId>
 			<version>4.0.0</version>
@@ -93,11 +96,6 @@
 			<groupId>com.sun.xml.ws</groupId>
 			<artifactId>rt</artifactId>
 			<version>4.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>31.1-jre</version>
 		</dependency>
 	</dependencies>
 </project>

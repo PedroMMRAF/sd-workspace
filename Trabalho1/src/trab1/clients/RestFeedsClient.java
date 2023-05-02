@@ -7,6 +7,7 @@ import trab1.api.java.Result;
 import trab1.api.rest.FeedsService;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -29,7 +30,16 @@ public class RestFeedsClient extends RestClient implements Feeds {
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.json(msg));
 
-        return Result.fromResponse(r);
+        return Result.fromResponse(r, Long.class);
+    }
+
+    public Result<Long> clt_postMessageOtherDomain(String user, Message msg) {
+        Response r = target.path("propagate").path(user)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.json(msg));
+
+        return Result.fromResponse(r, Long.class);
     }
 
     public Result<Void> clt_removeFromPersonalFeed(String user, long mid, String pwd) {
@@ -46,7 +56,7 @@ public class RestFeedsClient extends RestClient implements Feeds {
         Response r = target.path(user).path(Long.toString(mid))
                 .request().accept(MediaType.APPLICATION_JSON).get();
 
-        return Result.fromResponse(r);
+        return Result.fromResponse(r, Message.class);
     }
 
     public Result<List<Message>> clt_getMessages(String user, long time) {
@@ -54,12 +64,22 @@ public class RestFeedsClient extends RestClient implements Feeds {
                 .queryParam(FeedsService.TIME, time).request()
                 .accept(MediaType.APPLICATION_JSON).get();
 
-        return Result.fromResponse(r);
+        return Result.fromResponse(r, new GenericType<List<Message>>() {
+        });
     }
 
     public Result<Void> clt_subUser(String user, String userSub, String pwd) {
         Response r = target.path("sub").path(user).path(userSub)
                 .queryParam(FeedsService.PWD, pwd).request()
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.json(null));
+
+        return Result.fromResponse(r);
+    }
+
+    private Result<Void> clt_subUserOtherDomain(String user, String userSub) {
+        Response r = target.path("propagate").path(user).path(userSub)
+                .request()
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.json(null));
 
@@ -74,17 +94,32 @@ public class RestFeedsClient extends RestClient implements Feeds {
         return Result.fromResponse(r);
     }
 
-    public Result<List<String>> clt_listSubs(String user) {
-        Response r = target.path("sub").path("list").path(user)
-                .request().accept(MediaType.APPLICATION_JSON)
+    private Result<Void> clt_unsubUserOtherDomain(String user, String userSub) {
+        Response r = target.path("propagate").path(user).path(userSub)
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
                 .delete();
 
         return Result.fromResponse(r);
     }
 
+    public Result<List<String>> clt_listSubs(String user) {
+        Response r = target.path("sub").path("list").path(user)
+                .request().accept(MediaType.APPLICATION_JSON)
+                .delete();
+
+        return Result.fromResponse(r, new GenericType<List<String>>() {
+        });
+    }
+
     @Override
     public Result<Long> postMessage(String user, String pwd, Message msg) {
         return retry(() -> clt_postMessage(user, pwd, msg));
+    }
+
+    @Override
+    public Result<Long> postMessageOtherDomain(String user, Message msg) {
+        return retry(() -> clt_postMessageOtherDomain(user, msg));
     }
 
     @Override
@@ -108,8 +143,18 @@ public class RestFeedsClient extends RestClient implements Feeds {
     }
 
     @Override
+    public Result<Void> subUserOtherDomain(String user, String userSub) {
+        return retry(() -> clt_subUserOtherDomain(user, userSub));
+    }
+
+    @Override
     public Result<Void> unsubscribeUser(String user, String userSub, String pwd) {
         return retry(() -> clt_unsubscribeUser(user, userSub, pwd));
+    }
+
+    @Override
+    public Result<Void> unsubUserOtherDomain(String user, String userSub) {
+        return retry(() -> clt_unsubUserOtherDomain(user, userSub));
     }
 
     @Override
@@ -117,20 +162,7 @@ public class RestFeedsClient extends RestClient implements Feeds {
         return retry(() -> clt_listSubs(user));
     }
 
-    @Override
-    public Result<Long> postMessageOtherDomain(String user, Message msg) {
-        throw new UnsupportedOperationException("Unimplemented method 'postMessageOtherDomain'");
-    }
-
-    @Override
-    public Result<Void> subUserOtherDomain(String user, String userSub) {
-        throw new UnsupportedOperationException("Unimplemented method 'subUserOtherDomain'");
-    }
-
-    @Override
-    public Result<Void> unsubUserOtherDomain(String user, String userSub) {
-        throw new UnsupportedOperationException("Unimplemented method 'unsubUserOtherDomain'");
-    }
+    // Unimplemented on client
 
     @Override
     public Result<User> getUser(String user, String pwd) {
@@ -138,22 +170,22 @@ public class RestFeedsClient extends RestClient implements Feeds {
     }
 
     @Override
-    public boolean hasUser(String user) {
+    public Result<Boolean> hasUser(String user) {
         throw new UnsupportedOperationException("Unimplemented method 'hasUser'");
     }
 
     @Override
-    public void postMessagePropagate(String user, Message msg) {
+    public Result<Long> postMessagePropagate(String user, Message msg) {
         throw new UnsupportedOperationException("Unimplemented method 'postMessagePropagate'");
     }
 
     @Override
-    public void subUserPropagate(String user, String userSub) {
+    public Result<Void> subUserPropagate(String user, String userSub) {
         throw new UnsupportedOperationException("Unimplemented method 'subUserPropagate'");
     }
 
     @Override
-    public void unsubUserPropagate(String user, String userSub) {
+    public Result<Void> unsubUserPropagate(String user, String userSub) {
         throw new UnsupportedOperationException("Unimplemented method 'unsubUserPropagate'");
     }
 

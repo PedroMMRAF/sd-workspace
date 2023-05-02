@@ -2,6 +2,7 @@ package trab1.clients.users;
 
 import java.util.List;
 
+import trab1.Discovery;
 import trab1.api.User;
 import trab1.api.java.Result;
 import trab1.clients.ArgChecker;
@@ -26,5 +27,7 @@ public class SearchUserClient {
         }
 
         result.value().forEach((u) -> System.out.printf("%s", u));
+
+        Discovery.getInstance().kill();
     }
 }

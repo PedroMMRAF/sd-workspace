@@ -68,7 +68,7 @@ class DiscoveryImpl implements Discovery {
 
     private static Discovery singleton;
 
-    synchronized static Discovery getInstance() {
+    static Discovery getInstance() {
         if (singleton == null) {
             singleton = new DiscoveryImpl();
         }

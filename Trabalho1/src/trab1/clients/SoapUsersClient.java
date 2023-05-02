@@ -19,7 +19,7 @@ public class SoapUsersClient extends SoapClient implements Users {
 		super(serverURI);
 	}
 
-	synchronized private UsersService stub() {
+	private UsersService stub() {
 		if (stub == null) {
 			QName QNAME = new QName(UsersService.NAMESPACE, UsersService.NAME);
 			Service service = Service.create(toURL(serverURI + WSDL), QNAME);
@@ -52,5 +52,10 @@ public class SoapUsersClient extends SoapClient implements Users {
 	@Override
 	public Result<List<User>> searchUsers(String pattern) {
 		return retry(() -> toJavaResult(() -> stub().searchUsers(pattern)));
+	}
+
+	@Override
+	public Result<Boolean> hasUser(String name) {
+		return retry(() -> toJavaResult(() -> stub().hasUser(name)));
 	}
 }

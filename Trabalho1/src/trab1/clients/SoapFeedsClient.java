@@ -9,7 +9,7 @@ import trab1.api.Message;
 import trab1.api.User;
 import trab1.api.java.Feeds;
 import trab1.api.java.Result;
-import trab1.api.rest.FeedsService;
+import trab1.api.soap.FeedsService;
 import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.Service;
 
@@ -20,11 +20,11 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
 		super(serverURI);
 	}
 
-	synchronized private FeedsService stub() {
+	private FeedsService stub() {
 		if (stub == null) {
-			QName QNAME = new QName(FeedsService.NAMESPACE, FeedsService.PATH);
+			QName QNAME = new QName(FeedsService.NAMESPACE, FeedsService.NAME);
 			Service service = Service.create(toURL(serverURI + WSDL), QNAME);
-			stub = service.getPort(trab1.api.rest.FeedsService.class);
+			stub = service.getPort(trab1.api.soap.FeedsService.class);
 			setTimeouts((BindingProvider) stub);
 		}
 		return stub;
@@ -37,7 +37,7 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
 
 	@Override
 	public Result<Long> postMessageOtherDomain(String user, Message msg) {
-		throw new UnsupportedOperationException("Unimplemented method 'postMessageOtherDomain'");
+		return retry(() -> toJavaResult(() -> stub().postMessageOtherDomain(user, msg)));
 	}
 
 	@Override
@@ -72,13 +72,15 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
 
 	@Override
 	public Result<Void> subUserOtherDomain(String user, String userSub) {
-		throw new UnsupportedOperationException("Unimplemented method 'subUserOtherDomain'");
+		return retry(() -> toJavaResult(() -> stub().subUserOtherDomain(user, userSub)));
 	}
 
 	@Override
 	public Result<Void> unsubUserOtherDomain(String user, String userSub) {
-		throw new UnsupportedOperationException("Unimplemented method 'unsubUserOtherDomain'");
+		return retry(() -> toJavaResult(() -> stub().unsubUserOtherDomain(user, userSub)));
 	}
+
+	// Unimplemented on client
 
 	@Override
 	public Result<User> getUser(String user, String pwd) {
@@ -86,22 +88,22 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
 	}
 
 	@Override
-	public boolean hasUser(String user) {
+	public Result<Boolean> hasUser(String user) {
 		throw new UnsupportedOperationException("Unimplemented method 'hasUser'");
 	}
 
 	@Override
-	public void postMessagePropagate(String user, Message msg) {
+	public Result<Long> postMessagePropagate(String user, Message msg) {
 		throw new UnsupportedOperationException("Unimplemented method 'postMessagePropagate'");
 	}
 
 	@Override
-	public void subUserPropagate(String user, String userSub) {
+	public Result<Void> subUserPropagate(String user, String userSub) {
 		throw new UnsupportedOperationException("Unimplemented method 'subUserPropagate'");
 	}
 
 	@Override
-	public void unsubUserPropagate(String user, String userSub) {
+	public Result<Void> unsubUserPropagate(String user, String userSub) {
 		throw new UnsupportedOperationException("Unimplemented method 'unsubUserPropagate'");
 	}
 
@@ -114,5 +116,4 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
 	public Result<List<Message>> forwardGetMessages(String user, long time) {
 		throw new UnsupportedOperationException("Unimplemented method 'forwardGetMessages'");
 	}
-
 }

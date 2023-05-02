@@ -27,19 +27,6 @@ public interface Result<T> {
 				default -> INTERNAL_ERROR;
 			};
 		}
-
-		public static int toStatusCode(ErrorCode err) {
-			return switch (err) {
-				case OK -> 200;
-				case BAD_REQUEST -> 400;
-				case FORBIDDEN -> 403;
-				case NOT_FOUND -> 404;
-				case NOT_IMPLEMENTED -> 405;
-				case TIMEOUT -> 408;
-				case CONFLICT -> 409;
-				case INTERNAL_ERROR -> 500;
-			};
-		}
 	};
 
 	boolean isOK();
@@ -60,17 +47,29 @@ public interface Result<T> {
 		return new ErrorResult<>(error);
 	}
 
-	static <T> Result<T> fromResponse(Response res) {
-		ErrorCode err = ErrorCode.fromStatusCode(res.getStatus());
+	static <T> Result<T> error(int error) {
+		return new ErrorResult<>(ErrorCode.fromStatusCode(error));
+	}
 
-		if (err == ErrorCode.OK)
-			if (res.hasEntity())
-				return new OkResult<>(res.readEntity(new GenericType<>() {
-				}));
-			else
-				return new OkResult<>(null);
+	static <T> Result<T> fromResponse(Response r, Class<T> cls) {
+		if (r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity())
+			return Result.ok(r.readEntity(cls));
 
-		return new ErrorResult<>(ErrorCode.fromStatusCode(res.getStatus()));
+		return Result.error(r.getStatus());
+	}
+
+	static <T> Result<T> fromResponse(Response r, GenericType<T> cls) {
+		if (r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity())
+			return Result.ok(r.readEntity(cls));
+
+		return Result.error(r.getStatus());
+	}
+
+	static Result<Void> fromResponse(Response r) {
+		if (r.getStatus() == Response.Status.NO_CONTENT.getStatusCode())
+			return Result.ok();
+
+		return Result.error(r.getStatus());
 	}
 }
 

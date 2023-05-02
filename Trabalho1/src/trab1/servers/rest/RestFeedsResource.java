@@ -4,14 +4,15 @@ import java.util.List;
 
 import trab1.api.Message;
 import trab1.api.rest.FeedsService;
+import trab1.servers.java.JavaFeeds;
 import jakarta.inject.Singleton;
 
 @Singleton
 public class RestFeedsResource extends RestResource implements FeedsService {
-    private final RestFeeds impl;
+    private final JavaFeeds impl;
 
     public RestFeedsResource() {
-        impl = new RestFeeds();
+        impl = new JavaFeeds();
     }
 
     @Override

@@ -8,7 +8,6 @@ import jakarta.jws.WebService;
 
 @WebService(serviceName = UsersService.NAME, targetNamespace = UsersService.NAMESPACE, endpointInterface = UsersService.INTERFACE)
 public interface UsersService {
-
 	static final String NAME = "users";
 	static final String NAMESPACE = "http://sd2223";
 	static final String INTERFACE = "trab1.api.soap.UsersService";
@@ -70,6 +69,13 @@ public interface UsersService {
 	@WebMethod
 	List<User> searchUsers(String pattern) throws UsersException;
 
+	/**
+	 * Returns the state of existance of a user
+	 * 
+	 * @param pattern substring to search
+	 * @return true if the user exists, false otherwise
+	 * @throws UsersException otherwise
+	 */
 	@WebMethod
-	void verifyPassword(String name, String pwd) throws UsersException;
+	boolean hasUser(String name) throws UsersException;
 }
