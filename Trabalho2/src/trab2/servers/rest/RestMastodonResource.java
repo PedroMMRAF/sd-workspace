@@ -6,14 +6,14 @@ import jakarta.inject.Singleton;
 import trab2.api.Message;
 import trab2.api.java.Feeds;
 import trab2.api.rest.FeedsService;
-import trab2.servers.java.JavaFeeds;
+import trab2.mastodon.Mastodon;
 
 @Singleton
-public class RestFeedsResource extends RestResource implements FeedsService {
+public class RestMastodonResource extends RestResource implements FeedsService {
     private final Feeds impl;
 
-    public RestFeedsResource() {
-        impl = new JavaFeeds();
+    public RestMastodonResource() {
+        impl = Mastodon.getInstance();
     }
 
     @Override

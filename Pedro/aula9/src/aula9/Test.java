@@ -4,9 +4,6 @@ import aula9.api.java.Message;
 import aula9.mastodon.Mastodon;
 
 public class Test {
-	private static String USERNAME = "pmmrfernandes";
-	private static String PASSWORD = "h7ES2J8dq9THi9UN";
-
 	public static void main(String[] args) {
 		switch (args[0]) {
 			case "create":
@@ -17,17 +14,17 @@ public class Test {
 				break;
 		}
 
-		var res = Mastodon.getInstance().getMessages(USERNAME, 0);
+		var res = Mastodon.getInstance().getMessages(null, 0);
 		System.out.println(res);
 	}
 
 	private static void createMessage(String msg) {
-		var res = Mastodon.getInstance().postMessage(USERNAME, PASSWORD, new Message(0, USERNAME, "", msg));
+		var res = Mastodon.getInstance().postMessage(null, null, new Message(0, USERNAME, "", msg));
 		System.out.println(res);
 	}
 
 	private static void deleteMessage(long mid) {
-		var res = Mastodon.getInstance().removeFromPersonalFeed(USERNAME, mid, PASSWORD);
+		var res = Mastodon.getInstance().removeFromPersonalFeed(null, mid, null);
 		System.out.println(res);
 	}
 }

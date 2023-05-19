@@ -9,7 +9,7 @@ import trab2.api.Message;
 @WebService(serviceName = FeedsService.NAME, targetNamespace = FeedsService.NAMESPACE, endpointInterface = FeedsService.INTERFACE)
 public interface FeedsService {
 	static final String NAME = "feeds";
-	static final String NAMESPACE = "https://sd2223";
+	static final String NAMESPACE = "http://sd2223";
 	static final String INTERFACE = "trab2.api.soap.FeedsService";
 
 	/**

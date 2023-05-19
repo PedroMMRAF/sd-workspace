@@ -9,7 +9,7 @@ import trab2.api.User;
 @WebService(serviceName = UsersService.NAME, targetNamespace = UsersService.NAMESPACE, endpointInterface = UsersService.INTERFACE)
 public interface UsersService {
 	static final String NAME = "users";
-	static final String NAMESPACE = "https://sd2223";
+	static final String NAMESPACE = "http://sd2223";
 	static final String INTERFACE = "trab2.api.soap.UsersService";
 
 	/**

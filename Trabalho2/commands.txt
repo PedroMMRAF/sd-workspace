@@ -12,3 +12,9 @@ docker run --rm -it --name users --network sdnet sd2223-trab1-60694-60814 java -
 
 # Kill container
 docker kill <docker-name>
+
+
+docker run --rm -it -h feeds --name feeds --network sdnet -p 8080:8080 sd2223-trab2-60694-60814 `
+    java "-Djavax.net.ssl.keyStore=feeds0-ourorg0.jks" `
+        "-Djavax.net.ssl.keyStorePassword=feeds0-ourorg0.pwd" `
+    -cp sd2223.jar trab2.servers.rest.RestMastodonServer mastodon.social
