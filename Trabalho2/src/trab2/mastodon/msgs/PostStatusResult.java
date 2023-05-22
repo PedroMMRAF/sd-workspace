@@ -13,16 +13,15 @@ public record PostStatusResult(String id, String content, String created_at, Mas
 		return Long.valueOf(id);
 	}
 
-	long getCreationTime() {
-		String dateString = "2023-05-19T18:31:53.846Z";
+	public long getCreationTime() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-		LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+		LocalDateTime dateTime = LocalDateTime.parse(created_at, formatter);
 		Instant instant = dateTime.toInstant(ZoneOffset.UTC);
-		return instant.getEpochSecond();
+		return instant.getEpochSecond() * 1000 + instant.getNano() / 1000000;
 	}
 
 	public String getText() {
-		return content;
+		return content.substring(3, content.length() - 4);
 	}
 
 	public Message toMessage() {

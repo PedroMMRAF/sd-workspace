@@ -1,4 +1,4 @@
-package trab2.servers.rest;
+package trab2.servers.proxy;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -12,11 +12,11 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
 
-public class RestMastodonServer {
+public class ProxyFeedsServer {
     public static final int PORT = 8080;
     public static final String SERVICE = "feeds";
     private static final String SERVER_URI_FMT = "https://%s:%s/rest";
-    private static final Logger Log = Logger.getLogger(RestMastodonServer.class.getName());
+    private static final Logger Log = Logger.getLogger(ProxyFeedsServer.class.getName());
 
     static {
         System.setProperty("java.net.preferIPv4Stack", "true");
@@ -28,7 +28,7 @@ public class RestMastodonServer {
             Domain.set(args[0]);
 
             ResourceConfig config = new ResourceConfig();
-            config.register(RestMastodonResource.class);
+            config.register(ProxyFeedsResource.class);
 
             String ip = InetAddress.getLocalHost().getHostAddress();
             String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
