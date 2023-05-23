@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 import javax.net.ssl.SSLContext;
 
 public class RestFeedsServer {
-
     public static final int PORT = 8080;
     public static final String SERVICE = "feeds";
     private static final String SERVER_URI_FMT = "https://%s:%s/rest";
@@ -29,9 +28,9 @@ public class RestFeedsServer {
             Domain.set(args[0]);
 
             ResourceConfig config = new ResourceConfig();
-            config.register(RestFeedsResource.class);
+            config.register(new RestFeedsResource(Integer.parseInt(args[1])));
 
-            String ip = InetAddress.getLocalHost().getHostAddress();
+            String ip = InetAddress.getLocalHost().getHostName();
             String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
             JdkHttpServerFactory.createHttpServer(URI.create(serverURI), config, SSLContext.getDefault());
 

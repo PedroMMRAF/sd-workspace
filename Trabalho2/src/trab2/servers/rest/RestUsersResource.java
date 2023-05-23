@@ -2,12 +2,10 @@ package trab2.servers.rest;
 
 import java.util.List;
 
-import jakarta.inject.Singleton;
 import trab2.api.User;
 import trab2.api.rest.UsersService;
 import trab2.servers.java.JavaUsers;
 
-@Singleton
 public class RestUsersResource extends RestResource implements UsersService {
     private final JavaUsers impl;
 

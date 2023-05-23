@@ -5,6 +5,7 @@ import java.util.List;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -15,6 +16,8 @@ import trab2.api.Message;
 
 @Path(FeedsService.PATH)
 public interface FeedsService {
+	String HEADER_VERSION = "X-FEEDS-VERSION";
+
 	String MID = "mid";
 	String PWD = "pwd";
 	String SUB = "sub";
@@ -47,7 +50,8 @@ public interface FeedsService {
 	@Path("/{" + USER + "}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	long postMessage(@PathParam(USER) String user, @QueryParam(PWD) String pwd, Message msg);
+	long postMessage(@HeaderParam(HEADER_VERSION) Long version, @PathParam(USER) String user,
+			@QueryParam(PWD) String pwd, Message msg);
 
 	/**
 	 * Posts a new message in the feed, associating it to the feed of the specific
@@ -68,7 +72,7 @@ public interface FeedsService {
 	@Path("/" + PROPAGATE + "/{" + USER + "}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	long postMessageOtherDomain(@PathParam(USER) String user, Message msg);
+	long postMessageOtherDomain(@HeaderParam(HEADER_VERSION) Long version, @PathParam(USER) String user, Message msg);
 
 	/**
 	 * Removes the message identified by mid from the feed of user.
@@ -86,7 +90,8 @@ public interface FeedsService {
 	 */
 	@DELETE
 	@Path("/{" + USER + "}/{" + MID + "}")
-	void removeFromPersonalFeed(@PathParam(USER) String user, @PathParam(MID) long mid, @QueryParam(PWD) String pwd);
+	void removeFromPersonalFeed(@HeaderParam(HEADER_VERSION) Long version, @PathParam(USER) String user,
+			@PathParam(MID) long mid, @QueryParam(PWD) String pwd);
 
 	/**
 	 * Obtains the message with id from the feed of user (may be a remote user)
@@ -100,7 +105,8 @@ public interface FeedsService {
 	@GET
 	@Path("/{" + USER + "}/{" + MID + "}")
 	@Produces(MediaType.APPLICATION_JSON)
-	Message getMessage(@PathParam(USER) String user, @PathParam(MID) long mid);
+	Message getMessage(@HeaderParam(HEADER_VERSION) Long version, @PathParam(USER) String user,
+			@PathParam(MID) long mid);
 
 	/**
 	 * Returns a list of all messages stored in the server for a given user newer
@@ -115,7 +121,8 @@ public interface FeedsService {
 	@GET
 	@Path("/{" + USER + "}")
 	@Produces(MediaType.APPLICATION_JSON)
-	List<Message> getMessages(@PathParam(USER) String user, @QueryParam(TIME) long time);
+	List<Message> getMessages(@HeaderParam(HEADER_VERSION) Long version, @PathParam(USER) String user,
+			@QueryParam(TIME) long time);
 
 	/**
 	 * Subscribe a user.
@@ -134,7 +141,8 @@ public interface FeedsService {
 	 */
 	@POST
 	@Path("/" + SUB + "/{" + USER + "}/{" + USERSUB + "}")
-	void subUser(@PathParam(USER) String user, @PathParam(USERSUB) String userSub, @QueryParam(PWD) String pwd);
+	void subUser(@HeaderParam(HEADER_VERSION) Long version, @PathParam(USER) String user,
+			@PathParam(USERSUB) String userSub, @QueryParam(PWD) String pwd);
 
 	/**
 	 * Subscribe a user from another domain.
@@ -152,7 +160,8 @@ public interface FeedsService {
 	 */
 	@POST
 	@Path("/" + PROPAGATE + "/{" + USER + "}/{" + USERSUB + "}")
-	void subUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub);
+	void subUserOtherDomain(@HeaderParam(HEADER_VERSION) Long version, @PathParam(USER) String user,
+			@PathParam(USERSUB) String userSub);
 
 	/**
 	 * Unsubscribe a user
@@ -171,7 +180,8 @@ public interface FeedsService {
 	 */
 	@DELETE
 	@Path("/" + SUB + "/{" + USER + "}/{" + USERSUB + "}")
-	void unsubscribeUser(@PathParam(USER) String user, @PathParam(USERSUB) String userSub, @QueryParam(PWD) String pwd);
+	void unsubscribeUser(@HeaderParam(HEADER_VERSION) Long version, @PathParam(USER) String user,
+			@PathParam(USERSUB) String userSub, @QueryParam(PWD) String pwd);
 
 	/**
 	 * Unsubscribe a user from another domain.
@@ -189,7 +199,8 @@ public interface FeedsService {
 	 */
 	@DELETE
 	@Path("/" + PROPAGATE + "/{" + USER + "}/{" + USERSUB + "}")
-	void unsubUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub);
+	void unsubUserOtherDomain(@HeaderParam(HEADER_VERSION) Long version, @PathParam(USER) String user,
+			@PathParam(USERSUB) String userSub);
 
 	/**
 	 * Subscribed users.
@@ -201,5 +212,5 @@ public interface FeedsService {
 	@GET
 	@Path("/" + SUB + "/" + LIST + "/{" + USER + "}")
 	@Produces(MediaType.APPLICATION_JSON)
-	List<String> listSubs(@PathParam(USER) String user);
+	List<String> listSubs(@HeaderParam(HEADER_VERSION) Long version, @PathParam(USER) String user);
 }

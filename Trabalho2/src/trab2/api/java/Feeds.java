@@ -8,39 +8,39 @@ import trab2.api.User;
 public interface Feeds {
     public static final String NAME = "feeds";
 
-    Result<Long> postMessage(String user, String pwd, Message msg);
+    Result<Long> postMessage(Long version, String user, String pwd, Message msg);
 
-    Result<Long> postMessagePropagate(String user, Message msg);
+    Result<Long> postMessagePropagate(Long version, String user, Message msg);
 
-    Result<Long> postMessageOtherDomain(String user, Message msg);
+    Result<Long> postMessageOtherDomain(Long version, String user, Message msg);
 
-    Result<Void> removeFromPersonalFeed(String user, long mid, String pwd);
+    Result<Void> removeFromPersonalFeed(Long version, String user, long mid, String pwd);
 
-    Result<Message> getMessage(String user, long mid);
+    Result<Message> getMessage(Long version, String user, long mid);
 
-    Result<List<Message>> getMessages(String user, long time);
+    Result<List<Message>> getMessages(Long version, String user, long time);
 
-    Result<Void> subUser(String user, String userSub, String pwd);
+    Result<Void> subUser(Long version, String user, String userSub, String pwd);
 
-    Result<Void> subUserPropagate(String user, String userSub);
+    Result<Void> subUserPropagate(Long version, String user, String userSub);
 
-    Result<Void> subUserOtherDomain(String user, String userSub);
+    Result<Void> subUserOtherDomain(Long version, String user, String userSub);
 
-    Result<Void> unsubscribeUser(String user, String userSub, String pwd);
+    Result<Void> unsubscribeUser(Long version, String user, String userSub, String pwd);
 
-    Result<Void> unsubUserPropagate(String user, String userSub);
+    Result<Void> unsubUserPropagate(Long version, String user, String userSub);
 
-    Result<Void> unsubUserOtherDomain(String user, String userSub);
+    Result<Void> unsubUserOtherDomain(Long version, String user, String userSub);
 
-    Result<List<String>> listSubs(String user);
+    Result<List<String>> listSubs(Long version, String user);
 
     // Auxiliary methods
 
-    Result<User> getUser(String user, String pwd);
+    Result<User> getUser(Long version, String user, String pwd);
 
-    Result<Boolean> hasUser(String user);
+    Result<Boolean> hasUser(Long version, String user);
 
-    Result<Message> forwardGetMessage(String user, long msgId);
+    Result<Message> forwardGetMessage(Long version, String user, long msgId);
 
-    Result<List<Message>> forwardGetMessages(String user, long time);
+    Result<List<Message>> forwardGetMessages(Long version, String user, long time);
 }

@@ -9,7 +9,6 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 public class KafkaPublisher {
-
 	static public KafkaPublisher createPublisher(String brokers) {
 		Properties props = new Properties();
 
@@ -24,10 +23,10 @@ public class KafkaPublisher {
 
 		return new KafkaPublisher(new KafkaProducer<String, String>(props));
 	}
-	
+
 	private final KafkaProducer<String, String> producer;
 
-	private KafkaPublisher( KafkaProducer<String, String> producer) {
+	private KafkaPublisher(KafkaProducer<String, String> producer) {
 		this.producer = producer;
 	}
 
@@ -37,29 +36,19 @@ public class KafkaPublisher {
 
 	public long publish(String topic, String key, String value) {
 		try {
-			long offset = producer.send(new ProducerRecord<>(topic, key, value)).get().offset();
-			return offset;
+			return producer.send(new ProducerRecord<>(topic, key, value)).get().offset();
 		} catch (ExecutionException | InterruptedException x) {
 			x.printStackTrace();
 		}
 		return -1;
 	}
-	
+
 	public long publish(String topic, String value) {
 		try {
-			long offset = producer.send(new ProducerRecord<>(topic, value)).get().offset();
-			return offset;
+			return producer.send(new ProducerRecord<>(topic, value)).get().offset();
 		} catch (ExecutionException | InterruptedException x) {
 			x.printStackTrace();
 		}
 		return -1;
-	}
-	
-	
-	public static void main(String[] args) throws Exception {
-
-		
-		
-		
 	}
 }

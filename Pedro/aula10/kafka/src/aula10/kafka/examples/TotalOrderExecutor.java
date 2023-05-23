@@ -12,7 +12,7 @@ import aula10.kafka.sync.SyncPoint;
 public class TotalOrderExecutor extends Thread implements RecordProcessor {
     static final String FROM_BEGINNING = "earliest";
     static final String TOPIC = "single_partition_topic";
-    static final String KAFKA_BROKERS = "localhost:9092";
+    static final String KAFKA_BROKERS = "kafka:9092";
 
     static int MAX_NUM_THREADS = 4;
 
@@ -31,6 +31,7 @@ public class TotalOrderExecutor extends Thread implements RecordProcessor {
 
     public void run() {
         while (true) {
+            System.err.printf("replicaId: %s, sync state: %s\n", replicaId, sync);
             var operation = "op" + System.nanoTime();
             var version = sender.publish(TOPIC, replicaId, operation);
             var result = sync.waitForResult(version);

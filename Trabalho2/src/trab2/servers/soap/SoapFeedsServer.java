@@ -43,7 +43,7 @@ public class SoapFeedsServer {
         server.setExecutor(Executors.newCachedThreadPool());
         server.setHttpsConfigurator(new HttpsConfigurator(SSLContext.getDefault()));
 
-        var endpoint = Endpoint.create(new SoapFeedsWebService());
+        var endpoint = Endpoint.create(new SoapFeedsWebService(Integer.parseInt(args[1])));
         endpoint.publish(server.createContext("/soap"));
 
         server.start();

@@ -1,4 +1,4 @@
-package trab2.servers.proxy;
+package trab2.servers.rep;
 
 import java.util.List;
 
@@ -6,15 +6,15 @@ import jakarta.inject.Singleton;
 import trab2.api.Message;
 import trab2.api.java.Feeds;
 import trab2.api.rest.FeedsService;
-import trab2.mastodon.Mastodon;
+import trab2.servers.java.JavaFeeds;
 import trab2.servers.rest.RestResource;
 
 @Singleton
-public class ProxyFeedsResource extends RestResource implements FeedsService {
+public class RepFeedsResource extends RestResource implements FeedsService {
     private final Feeds impl;
 
-    public ProxyFeedsResource() {
-        impl = Mastodon.getInstance();
+    public RepFeedsResource(int seq) {
+        impl = new JavaFeeds(seq);
     }
 
     @Override

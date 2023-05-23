@@ -9,7 +9,7 @@ fi
 	docker network create --driver=bridge sdnet
 
 IMAGE=smduarte/sd2223-kafka
-docker pull $IMAGE 
+docker pull $IMAGE
 
 echo "Launching Kafka Server: "  $1
 

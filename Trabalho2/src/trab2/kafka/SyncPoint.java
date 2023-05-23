@@ -1,4 +1,4 @@
-package aula10.kafka.sync;
+package trab2.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,8 +37,8 @@ public class SyncPoint<T> {
 	 * not available.
 	 */
 	public synchronized T waitForResult(long n) {
-		waitForVersion(n, 1000);
-		return results.get(n);
+		waitForVersion(n, Integer.MAX_VALUE);
+		return results.remove(n);
 	}
 
 	/**
