@@ -16,9 +16,9 @@ public class SoapFeedsWebService extends SoapWebService<FeedsException> implemen
 
 	final Feeds impl;
 
-	public SoapFeedsWebService() {
+	public SoapFeedsWebService(int initialSequence) {
 		super((result) -> new FeedsException(result.error().toString()));
-		this.impl = new JavaFeeds();
+		this.impl = new JavaFeeds(initialSequence);
 	}
 
 	@Override

@@ -29,9 +29,9 @@ public class RestFeedsServer {
             Domain.set(args[0]);
 
             ResourceConfig config = new ResourceConfig();
-            config.register(RestFeedsResource.class);
+            config.register(new RestFeedsResource(Integer.parseInt(args[1])));
 
-            String ip = InetAddress.getLocalHost().getHostAddress();
+            String ip = InetAddress.getLocalHost().getHostName();
             String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
             JdkHttpServerFactory.createHttpServer(URI.create(serverURI), config, SSLContext.getDefault());
 

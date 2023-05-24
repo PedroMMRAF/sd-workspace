@@ -3,9 +3,9 @@ package trab2.servers.java;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 import trab2.api.Message;
@@ -19,11 +19,13 @@ import trab2.servers.Domain;
 public class JavaFeeds implements Feeds {
     private static Logger Log = Logger.getLogger(JavaFeeds.class.getName());
 
+    private AtomicLong sequence;
     private Map<String, Map<Long, Message>> feeds;
     private Map<String, Set<String>> following;
     private Map<String, Set<String>> followers;
 
-    public JavaFeeds() {
+    public JavaFeeds(int initialSequence) {
+        sequence = new AtomicLong(initialSequence * 0xFFFF);
         feeds = new ConcurrentHashMap<>();
         following = new ConcurrentHashMap<>();
         followers = new ConcurrentHashMap<>();
@@ -73,7 +75,7 @@ public class JavaFeeds implements Feeds {
                 || !Domain.get().equals(userDomain))
             return Result.error(Result.ErrorCode.BAD_REQUEST);
 
-        long id = UUID.randomUUID().getMostSignificantBits();
+        long id = sequence.incrementAndGet();
         msg.setId(id);
 
         logInfo("postMessage", "user", user, "pwd", pwd, "msg", msg);

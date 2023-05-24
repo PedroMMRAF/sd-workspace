@@ -2,18 +2,16 @@ package trab2.servers.rest;
 
 import java.util.List;
 
-import jakarta.inject.Singleton;
 import trab2.api.Message;
 import trab2.api.java.Feeds;
 import trab2.api.rest.FeedsService;
 import trab2.servers.java.JavaFeeds;
 
-@Singleton
 public class RestFeedsResource extends RestResource implements FeedsService {
     private final Feeds impl;
 
-    public RestFeedsResource() {
-        impl = new JavaFeeds();
+    public RestFeedsResource(int initialSequence) {
+        impl = new JavaFeeds(initialSequence);
     }
 
     @Override
