@@ -38,7 +38,10 @@ public class RepManager {
         return waitForResult(sender.publish(TOPIC, function));
     }
 
-    public Result<?> waitForResult(long version) {
+    public Result<?> waitForResult(Long version) {
+        if (version == null)
+            version = currentVersion;
+
         return sync.waitForResult(version);
     }
 
