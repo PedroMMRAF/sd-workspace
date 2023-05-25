@@ -6,12 +6,13 @@ import java.util.Properties;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.serialization.StringDeserializer;
 
-public class KafkaSubscriber {
+import trab2.kafka.methods.MethodDeserializer;
+
+public class KafkaSubscriber<T> {
     private static final long POLL_TIMEOUT = 1L;
 
-    private final KafkaConsumer<String, List<Object>> consumer;
+    private final KafkaConsumer<String, T> consumer;
 
     public KafkaSubscriber(String brokers, List<String> topics, String mode) {
         Properties props = new Properties();
@@ -26,24 +27,24 @@ public class KafkaSubscriber {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "grp" + System.nanoTime());
 
         // Classe para serializar as chaves dos eventos (string)
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, MethodDeserializer.class.getName());
 
         // Classe para serializar os valores dos eventos (string)
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, MethodDeserializer.class.getName());
 
         // Cria um consumidor (assinante/subscriber)
-        this.consumer = new KafkaConsumer<String, List<Object>>(props);
+        this.consumer = new KafkaConsumer<String, T>(props);
         this.consumer.subscribe(topics);
     }
 
-    public void start(boolean block, RecordProcessor processor) {
+    public void start(boolean block, RecordProcessor<T> processor) {
         if (block)
             consume(processor);
         else
             new Thread(() -> consume(processor)).start();
     }
 
-    private void consume(RecordProcessor processor) {
+    private void consume(RecordProcessor<T> processor) {
         while (true)
             consumer.poll(Duration.ofSeconds(POLL_TIMEOUT)).forEach(r -> {
                 processor.onReceive(r);

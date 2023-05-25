@@ -29,7 +29,7 @@ public class RepFeedsServer {
 
             ResourceConfig config = new ResourceConfig();
             RepManager repManager = new RepManager();
-            config.register(new RepFeedsResource(Integer.parseInt(args[1]), repManager));
+            config.register(new RepFeedsResource(repManager));
             config.register(new VersionFilter(repManager));
 
             String ip = InetAddress.getLocalHost().getHostName();

@@ -1,16 +1,16 @@
 package trab2.kafka;
 
-import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
+// import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringSerializer;
 
-public class KafkaPublisher {
-    private final KafkaProducer<String, List<Object>> producer;
+import trab2.kafka.methods.MethodSerializer;
+
+public class KafkaPublisher<T> {
+    private final KafkaProducer<String, T> producer;
 
     public KafkaPublisher(String brokers) {
         Properties props = new Properties();
@@ -19,22 +19,22 @@ public class KafkaPublisher {
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
 
         // Classe para serializar as chaves dos eventos (string)
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, MethodSerializer.class.getName());
 
         // Classe para serializar os valores dos eventos (string)
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, MethodSerializer.class.getName());
 
-        this.producer = new KafkaProducer<String, List<Object>>(props);
+        this.producer = new KafkaProducer<String, T>(props);
     }
 
     public void close() {
         this.producer.close();
     }
 
-    public long publish(String topic, List<Object> value) {
+    public long publish(String topic, T value) {
         try {
             return producer.send(new ProducerRecord<>(topic, value)).get().offset();
-        } catch (ExecutionException | InterruptedException x) {
+        } catch (Exception x) {
             x.printStackTrace();
         }
         return -1;

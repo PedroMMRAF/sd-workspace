@@ -198,13 +198,12 @@ public class JavaFeeds implements Feeds {
 
         String subDomain = userSub.split("@")[1];
 
-        if (!hasUser(userSub).value())
-            return Result.error(Result.ErrorCode.NOT_FOUND);
-
         if (!subDomain.equals(Domain.get()))
             unsubUserPropagate(user, userSub);
 
-        getFollowing(user).remove(userSub);
+        if (!getFollowing(user).remove(userSub))
+            return Result.error(Result.ErrorCode.NOT_FOUND);
+
         getFollowers(userSub).remove(user);
 
         return Result.ok();
