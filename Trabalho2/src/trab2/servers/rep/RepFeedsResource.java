@@ -1,6 +1,7 @@
 package trab2.servers.rep;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
@@ -17,7 +18,10 @@ public class RepFeedsResource extends RestResource implements FeedsService, Reco
     private final Feeds impl;
     private final RepManager repManager;
 
-    public RepFeedsResource(RepManager repManager) {
+    private AtomicLong sequence;
+
+    public RepFeedsResource(RepManager repManager, int initialSequence) {
+        sequence = new AtomicLong(initialSequence * 0xFFFF);
         impl = new JavaFeeds(0);
         this.repManager = repManager;
         repManager.register(this);
@@ -26,6 +30,8 @@ public class RepFeedsResource extends RestResource implements FeedsService, Reco
     @Override
     @SuppressWarnings("unchecked")
     public long postMessage(Long version, String user, String pwd, Message msg) {
+        msg.setId(sequence.getAndIncrement());
+
         return fromJavaResult((Result<Long>) repManager.update(new PostMessageMethod(user, pwd, msg)));
     }
 

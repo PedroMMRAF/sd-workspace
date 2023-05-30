@@ -75,8 +75,11 @@ public class JavaFeeds implements Feeds {
                 || !Domain.get().equals(userDomain))
             return Result.error(Result.ErrorCode.BAD_REQUEST);
 
-        long id = sequence.incrementAndGet();
-        msg.setId(id);
+        long id = msg.getId();
+        if (id == -1) {
+            id = sequence.incrementAndGet();
+            msg.setId(id);
+        }
 
         logInfo("postMessage", "user", user, "pwd", pwd, "msg", msg);
 
