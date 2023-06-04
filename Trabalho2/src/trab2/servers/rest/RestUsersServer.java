@@ -26,7 +26,7 @@ public class RestUsersServer {
 
     public static void main(String[] args) {
         try {
-            Domain.set(args[0]);
+            Domain.set(args[0], 0, null);
 
             ResourceConfig config = new ResourceConfig();
             config.register(new RestUsersResource());
@@ -37,7 +37,7 @@ public class RestUsersServer {
 
             Log.info(String.format("%s Server ready @ %s\n", SERVICE, serverURI));
 
-            Discovery.getInstance().announce(Domain.get(), SERVICE, serverURI);
+            Discovery.getInstance().announce(Domain.domain(), SERVICE, serverURI);
         } catch (Exception e) {
             Log.severe(e.getMessage());
         }

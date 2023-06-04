@@ -23,7 +23,7 @@ public class SoapUsersServer {
 	private static Logger Log = Logger.getLogger(SoapUsersServer.class.getName());
 
 	public static void main(String[] args) throws Exception {
-		Domain.set(args[0]);
+		Domain.set(args[0], 0, null);
 
 		// System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump",
 		// "true");
@@ -50,6 +50,6 @@ public class SoapUsersServer {
 
 		Log.info(String.format("%s Soap Server ready @ %s\n", SERVICE_NAME, serverURI));
 
-		Discovery.getInstance().announce(Domain.get(), SERVICE_NAME, serverURI);
+		Discovery.getInstance().announce(Domain.domain(), SERVICE_NAME, serverURI);
 	}
 }

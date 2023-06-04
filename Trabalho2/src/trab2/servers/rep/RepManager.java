@@ -19,7 +19,15 @@ public class RepManager {
     private final KafkaSubscriber<Method> receiver;
     private final SyncPoint<Result<?>> sync;
 
-    public RepManager() {
+    private static RepManager instance;
+
+    public static RepManager getInstance() {
+        if (instance == null)
+            instance = new RepManager();
+        return instance;
+    }
+
+    private RepManager() {
         sender = new KafkaPublisher<>(KAFKA_BROKERS);
         receiver = new KafkaSubscriber<>(KAFKA_BROKERS, List.of(TOPIC), FROM_BEGINNING);
         sync = SyncPoint.getInstance();
@@ -45,7 +53,7 @@ public class RepManager {
         return sync.waitForResult(version);
     }
 
-    public void setVersion(long version, Result<?> result) {
+    public void setResult(long version, Result<?> result) {
         sync.setResult(currentVersion = version, result);
     }
 }

@@ -3,7 +3,7 @@
 rm -f *.jks
 rm -f *.cert
 
-function manhix {
+function createcert {
     name=$1
     file=$2
     passwd=$3

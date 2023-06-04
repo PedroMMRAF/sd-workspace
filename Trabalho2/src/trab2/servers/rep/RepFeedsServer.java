@@ -25,12 +25,11 @@ public class RepFeedsServer {
 
     public static void main(String[] args) {
         try {
-            Domain.set(args[0]);
+            Domain.set(args[0], Long.parseLong(args[1]), args[2]);
 
             ResourceConfig config = new ResourceConfig();
-            RepManager repManager = new RepManager();
-            config.register(new RepFeedsResource(repManager, Integer.parseInt(args[1])));
-            config.register(new VersionFilter(repManager));
+            config.register(RepFeedsResource.class);
+            config.register(VersionFilter.class);
 
             String ip = InetAddress.getLocalHost().getHostName();
             String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
@@ -38,7 +37,7 @@ public class RepFeedsServer {
 
             Log.info(String.format("%s Server ready @ %s\n", SERVICE, serverURI));
 
-            Discovery.getInstance().announce(Domain.get(), SERVICE, serverURI);
+            Discovery.getInstance().announce(Domain.domain(), SERVICE, serverURI);
         } catch (Exception e) {
             Log.severe(e.getMessage());
         }
