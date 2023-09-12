@@ -1,30 +1,28 @@
 package trab2.mastodon;
 
-import static trab2.api.java.Result.error;
 import static trab2.api.java.Result.ok;
+import static trab2.api.java.Result.error;
 import static trab2.api.java.Result.ErrorCode.*;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import com.google.gson.reflect.TypeToken;
 
-import trab2.api.Message;
 import trab2.api.User;
+import trab2.api.Message;
 import trab2.api.java.Feeds;
 import trab2.api.java.Result;
 import trab2.api.java.Result.ErrorCode;
-import trab2.mastodon.msgs.MastodonAccount;
 import trab2.mastodon.msgs.PostStatusArgs;
+import trab2.mastodon.msgs.MastodonAccount;
 import trab2.mastodon.msgs.PostStatusResult;
 
+import com.github.scribejava.core.model.Verb;
+import com.github.scribejava.core.model.Response;
+import com.github.scribejava.core.model.OAuthRequest;
+import com.github.scribejava.core.oauth.OAuth20Service;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth2AccessToken;
-import com.github.scribejava.core.model.OAuthRequest;
-import com.github.scribejava.core.model.Response;
-import com.github.scribejava.core.model.Verb;
-import com.github.scribejava.core.oauth.OAuth20Service;
 
 import utils.JSON;
 
@@ -238,7 +236,7 @@ public class Mastodon implements Feeds {
     }
 
     @Override
-    public Result<Long> postMessageOtherDomain(String user, Message msg) {
+    public Result<Long> postMessageOtherDomain(String user, String secret, Message msg) {
         return error(NOT_IMPLEMENTED);
     }
 
@@ -248,7 +246,7 @@ public class Mastodon implements Feeds {
     }
 
     @Override
-    public Result<Void> subUserOtherDomain(String user, String userSub) {
+    public Result<Void> subUserOtherDomain(String user, String userSub, String secret) {
         return error(NOT_IMPLEMENTED);
     }
 
@@ -258,7 +256,7 @@ public class Mastodon implements Feeds {
     }
 
     @Override
-    public Result<Void> unsubUserOtherDomain(String user, String userSub) {
+    public Result<Void> unsubUserOtherDomain(String user, String userSub, String secret) {
         return error(NOT_IMPLEMENTED);
     }
 
@@ -280,36 +278,5 @@ public class Mastodon implements Feeds {
     @Override
     public Result<List<Message>> forwardGetMessages(String user, long time) {
         return error(NOT_IMPLEMENTED);
-    }
-
-    public static void main(String[] args) throws Exception {
-        Mastodon.getInstance().resetFeed();
-    }
-
-    private void resetFeed() throws InterruptedException, ExecutionException, IOException {
-        OAuthRequest request = new OAuthRequest(Verb.GET, getEndpoint(TIMELINES_PATH));
-        service.signRequest(accessToken, request);
-        Response response = service.execute(request);
-
-        if (response.getCode() != HTTP_OK) {
-            System.err.println("nao deu");
-        }
-
-        List<PostStatusResult> res = JSON.decode(response.getBody(), new TypeToken<List<PostStatusResult>>() {
-        });
-
-        for (PostStatusResult msg : res) {
-            request = new OAuthRequest(Verb.DELETE, getEndpoint(MESSAGE_STATUSES_PATH, msg.getId()));
-            service.signRequest(accessToken, request);
-            response = service.execute(request);
-
-            if (response.getCode() != HTTP_OK) {
-                System.err.println("falhou o " + msg.getId());
-            } else {
-                System.out.println("apagou o " + msg.getId());
-            }
-        }
-
-        return;
     }
 }

@@ -5,40 +5,34 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
+import jakarta.inject.Singleton;
 import trab2.api.Message;
 import trab2.api.java.Feeds;
-import trab2.api.java.Result;
+import trab2.kafka.methods.*;
 import trab2.kafka.RecordProcessor;
 import trab2.kafka.api.FeedsService;
-import trab2.kafka.methods.*;
+import trab2.servers.Domain;
 import trab2.servers.java.JavaFeeds;
 import trab2.servers.rest.RestResource;
 
+@Singleton
 public class RepFeedsResource extends RestResource implements FeedsService, RecordProcessor<Method> {
-    private final Feeds impl;
-    private final RepManager repManager;
-
+    private Feeds impl;
+    private RepManager repManager;
     private AtomicLong sequence;
 
-    public RepFeedsResource(RepManager repManager, int initialSequence) {
-        sequence = new AtomicLong(initialSequence * 0xFFFF);
-        impl = new JavaFeeds(0);
-        this.repManager = repManager;
+    public RepFeedsResource() {
+        impl = new JavaFeeds();
+        sequence = new AtomicLong(Domain.sequence() * 0xFFFF);
+        repManager = RepManager.getInstance();
+
         repManager.register(this);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public long postMessage(Long version, String user, String pwd, Message msg) {
         msg.setId(sequence.getAndIncrement());
-
-        return fromJavaResult((Result<Long>) repManager.update(new PostMessageMethod(user, pwd, msg)));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public long postMessageOtherDomain(Long version, String user, Message msg) {
-        return fromJavaResult((Result<Long>) repManager.update(new PostMessageOtherDomainMethod(user, msg)));
+        return (long) fromJavaResult(repManager.update(new PostMessageMethod(user, pwd, msg)));
     }
 
     @Override
@@ -64,18 +58,8 @@ public class RepFeedsResource extends RestResource implements FeedsService, Reco
     }
 
     @Override
-    public void subUserOtherDomain(Long version, String user, String userSub) {
-        fromJavaResult(repManager.update(new SubUserOtherDomainMethod(user, userSub)));
-    }
-
-    @Override
     public void unsubscribeUser(Long version, String user, String userSub, String pwd) {
         fromJavaResult(repManager.update(new UnsubscribeUserMethod(user, userSub, pwd)));
-    }
-
-    @Override
-    public void unsubUserOtherDomain(Long version, String user, String userSub) {
-        fromJavaResult(repManager.update(new UnsubUserOtherDomainMethod(user, userSub)));
     }
 
     @Override
@@ -84,8 +68,27 @@ public class RepFeedsResource extends RestResource implements FeedsService, Reco
         return fromJavaResult(impl.listSubs(user));
     }
 
+    // Internal methods
+
+    @Override
+    public long postMessageOtherDomain(Long version, String user, String secret, Message msg) {
+        return (long) fromJavaResult(repManager.update(new PostMessageOtherDomainMethod(user, secret, msg)));
+    }
+
+    @Override
+    public void subUserOtherDomain(Long version, String user, String userSub, String secret) {
+        fromJavaResult(repManager.update(new SubUserOtherDomainMethod(user, userSub, secret)));
+    }
+
+    @Override
+    public void unsubUserOtherDomain(Long version, String user, String userSub, String secret) {
+        fromJavaResult(repManager.update(new UnsubUserOtherDomainMethod(user, userSub, secret)));
+    }
+
+    // RecordProcessor method
+
     @Override
     public void onReceive(ConsumerRecord<String, Method> r) {
-        repManager.setVersion(r.offset(), r.value().call(impl));
+        repManager.setResult(r.offset(), r.value().call(impl));
     }
 }

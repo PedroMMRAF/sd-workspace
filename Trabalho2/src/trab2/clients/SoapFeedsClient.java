@@ -36,11 +36,6 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
     }
 
     @Override
-    public Result<Long> postMessageOtherDomain(String user, Message msg) {
-        return retry(() -> toJavaResult(() -> stub().postMessageOtherDomain(user, msg)));
-    }
-
-    @Override
     public Result<Void> removeFromPersonalFeed(String user, long mid, String pwd) {
         return retry(() -> toJavaResult(() -> stub().removeFromPersonalFeed(user, mid, pwd)));
     }
@@ -70,14 +65,21 @@ public class SoapFeedsClient extends SoapClient implements Feeds {
         return retry(() -> toJavaResult(() -> stub().listSubs(user)));
     }
 
+    // Internal methods
+
     @Override
-    public Result<Void> subUserOtherDomain(String user, String userSub) {
-        return retry(() -> toJavaResult(() -> stub().subUserOtherDomain(user, userSub)));
+    public Result<Long> postMessageOtherDomain(String user, String secret, Message msg) {
+        return retry(() -> toJavaResult(() -> stub().postMessageOtherDomain(user, secret, msg)));
     }
 
     @Override
-    public Result<Void> unsubUserOtherDomain(String user, String userSub) {
-        return retry(() -> toJavaResult(() -> stub().unsubUserOtherDomain(user, userSub)));
+    public Result<Void> subUserOtherDomain(String user, String userSub, String secret) {
+        return retry(() -> toJavaResult(() -> stub().subUserOtherDomain(user, userSub, secret)));
+    }
+
+    @Override
+    public Result<Void> unsubUserOtherDomain(String user, String userSub, String secret) {
+        return retry(() -> toJavaResult(() -> stub().unsubUserOtherDomain(user, userSub, secret)));
     }
 
     // Unimplemented on client

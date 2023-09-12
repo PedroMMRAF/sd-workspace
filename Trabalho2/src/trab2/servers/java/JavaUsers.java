@@ -46,7 +46,7 @@ public class JavaUsers implements Users {
                 || user.getPwd() == null
                 || user.getDisplayName() == null
                 || user.getDomain() == null
-                || !user.getDomain().equals(Domain.get()))
+                || !user.getDomain().equals(Domain.domain()))
             return Result.error(Result.ErrorCode.BAD_REQUEST);
 
         if (users.containsKey(user.getName()))
@@ -90,7 +90,7 @@ public class JavaUsers implements Users {
         User user = res.value();
 
         if ((newUser.getName() != null && !newUser.getName().equals(user.getName()))
-                || (newUser.getDomain() != null && !newUser.getDomain().equals(Domain.get())))
+                || (newUser.getDomain() != null && !newUser.getDomain().equals(Domain.domain())))
             return Result.error(Result.ErrorCode.BAD_REQUEST);
 
         if (newUser.getPwd() != null)

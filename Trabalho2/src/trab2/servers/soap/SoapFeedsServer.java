@@ -23,7 +23,7 @@ public class SoapFeedsServer {
     private static Logger Log = Logger.getLogger(SoapFeedsServer.class.getName());
 
     public static void main(String[] args) throws Exception {
-        Domain.set(args[0]);
+        Domain.set(args[0], Long.parseLong(args[1]), args[2]);
 
         // System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump",
         // "true");
@@ -43,13 +43,13 @@ public class SoapFeedsServer {
         server.setExecutor(Executors.newCachedThreadPool());
         server.setHttpsConfigurator(new HttpsConfigurator(SSLContext.getDefault()));
 
-        var endpoint = Endpoint.create(new SoapFeedsWebService(Integer.parseInt(args[1])));
+        var endpoint = Endpoint.create(new SoapFeedsWebService());
         endpoint.publish(server.createContext("/soap"));
 
         server.start();
 
         Log.info(String.format("%s Soap Server ready @ %s\n", SERVICE_NAME, serverURI));
 
-        Discovery.getInstance().announce(Domain.get(), SERVICE_NAME, serverURI);
+        Discovery.getInstance().announce(Domain.domain(), SERVICE_NAME, serverURI);
     }
 }

@@ -21,6 +21,7 @@ public interface FeedsService {
     String USER = "user";
     String TIME = "time";
     String LIST = "list";
+    String SECRET = "secret";
     String USERSUB = "userSub";
     String PROPAGATE = "propagate";
 
@@ -50,27 +51,6 @@ public interface FeedsService {
     long postMessage(@PathParam(USER) String user, @QueryParam(PWD) String pwd, Message msg);
 
     /**
-     * Posts a new message in the feed, associating it to the feed of the specific
-     * user.
-     * A message should be identified before publish it, by assigning an ID.
-     * A user must contact the server of her domain directly (i.e., this operation
-     * should not be
-     * propagated to other domain)
-     *
-     * @param user user of the operation (format user@domain)
-     * @param msg  the message object to be posted to the server
-     * @return 200 the unique numerical identifier for the posted message;
-     *         404 if the publisher does not exist in the current domain
-     *         403 if the pwd is not correct
-     *         400 otherwise
-     */
-    @POST
-    @Path("/" + PROPAGATE + "/{" + USER + "}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    long postMessageOtherDomain(@PathParam(USER) String user, Message msg);
-
-    /**
      * Removes the message identified by mid from the feed of user.
      * A user must contact the server of her domain directly (i.e., this operation
      * should not be
@@ -86,7 +66,8 @@ public interface FeedsService {
      */
     @DELETE
     @Path("/{" + USER + "}/{" + MID + "}")
-    void removeFromPersonalFeed(@PathParam(USER) String user, @PathParam(MID) long mid, @QueryParam(PWD) String pwd);
+    void removeFromPersonalFeed(@PathParam(USER) String user, @PathParam(MID) long mid,
+            @QueryParam(PWD) String pwd);
 
     /**
      * Obtains the message with id from the feed of user (may be a remote user)
@@ -137,24 +118,6 @@ public interface FeedsService {
     void subUser(@PathParam(USER) String user, @PathParam(USERSUB) String userSub, @QueryParam(PWD) String pwd);
 
     /**
-     * Subscribe a user from another domain.
-     * A user must contact the server of her domain directly (i.e., this operation
-     * should not be
-     * propagated to other domain)
-     *
-     * @param user    the user subscribing (following) other user (format
-     *                user@domain)
-     * @param userSub the user to be subscribed (followed) (format user@domain)
-     * @return 204 if ok
-     *         404 is generated if the user to be subscribed does not exist
-     *         403 is generated if the user does not exist or if the pwd is not
-     *         correct
-     */
-    @POST
-    @Path("/" + PROPAGATE + "/{" + USER + "}/{" + USERSUB + "}")
-    void subUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub);
-
-    /**
      * Unsubscribe a user
      * A user must contact the server of her domain directly (i.e., this operation
      * should not be
@@ -171,25 +134,8 @@ public interface FeedsService {
      */
     @DELETE
     @Path("/" + SUB + "/{" + USER + "}/{" + USERSUB + "}")
-    void unsubscribeUser(@PathParam(USER) String user, @PathParam(USERSUB) String userSub, @QueryParam(PWD) String pwd);
-
-    /**
-     * Unsubscribe a user from another domain.
-     * A user must contact the server of her domain directly (i.e., this operation
-     * should not be
-     * propagated to other domain)
-     *
-     * @param user    the user subscribing (following) other user (format
-     *                user@domain)
-     * @param userSub the user to be subscribed (followed) (format user@domain)
-     * @return 204 if ok
-     *         404 is generated if the user to be subscribed does not exist
-     *         403 is generated if the user does not exist or if the pwd is not
-     *         correct
-     */
-    @DELETE
-    @Path("/" + PROPAGATE + "/{" + USER + "}/{" + USERSUB + "}")
-    void unsubUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub);
+    void unsubscribeUser(@PathParam(USER) String user, @PathParam(USERSUB) String userSub,
+            @QueryParam(PWD) String pwd);
 
     /**
      * Subscribed users.
@@ -202,4 +148,22 @@ public interface FeedsService {
     @Path("/" + SUB + "/" + LIST + "/{" + USER + "}")
     @Produces(MediaType.APPLICATION_JSON)
     List<String> listSubs(@PathParam(USER) String user);
+
+    // Internal methods
+
+    @POST
+    @Path("/" + PROPAGATE + "/{" + USER + "}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    long postMessageOtherDomain(@PathParam(USER) String user, @QueryParam(SECRET) String secret, Message msg);
+
+    @POST
+    @Path("/" + PROPAGATE + "/{" + USER + "}/{" + USERSUB + "}")
+    void subUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub,
+            @QueryParam(SECRET) String secret);
+
+    @DELETE
+    @Path("/" + PROPAGATE + "/{" + USER + "}/{" + USERSUB + "}")
+    void unsubUserOtherDomain(@PathParam(USER) String user, @PathParam(USERSUB) String userSub,
+            @QueryParam(SECRET) String secret);
 }

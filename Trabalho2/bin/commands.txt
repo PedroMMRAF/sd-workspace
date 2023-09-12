@@ -1,0 +1,20 @@
+# Maven compile
+mvn clean compile assembly:single docker:build
+
+# Run Users Server
+docker run --rm -it -h feeds.nova --name feeds.nova --network sdnet -p 8080:8080 sd2223-trab1-60694-60814 java -cp sd2223.jar trab1.server.users.UsersServer nova
+
+# Run Users CreateUserClient
+docker run --rm -it --name users --network sdnet sd2223-trab1-60694-60814 java -cp sd2223.jar trab1.client.users.CreateUserClient nova john 12345 John
+
+# Run tests
+.\test-sd-tp2.bat -image sd2223-trab1-60694-60814
+
+# Kill container
+docker kill <docker-name>
+
+
+docker run --rm -it -h feeds --name feeds --network sdnet -p 8080:8080 sd2223-trab2-60694-60814 `
+    java "-Djavax.net.ssl.keyStore=feeds0-ourorg0.jks" `
+        "-Djavax.net.ssl.keyStorePassword=feeds0-ourorg0.pwd" `
+    -cp sd2223.jar trab2.servers.rest.RestMastodonServer mastodon.social

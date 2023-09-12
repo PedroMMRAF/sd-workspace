@@ -2,26 +2,23 @@ package trab2.servers.rest;
 
 import java.util.List;
 
+import jakarta.inject.Singleton;
 import trab2.api.Message;
 import trab2.api.java.Feeds;
 import trab2.api.rest.FeedsService;
 import trab2.servers.java.JavaFeeds;
 
+@Singleton
 public class RestFeedsResource extends RestResource implements FeedsService {
     private final Feeds impl;
 
-    public RestFeedsResource(int initialSequence) {
-        impl = new JavaFeeds(initialSequence);
+    public RestFeedsResource() {
+        impl = new JavaFeeds();
     }
 
     @Override
     public long postMessage(String user, String pwd, Message msg) {
         return fromJavaResult(impl.postMessage(user, pwd, msg));
-    }
-
-    @Override
-    public long postMessageOtherDomain(String user, Message msg) {
-        return fromJavaResult(impl.postMessageOtherDomain(user, msg));
     }
 
     @Override
@@ -45,22 +42,29 @@ public class RestFeedsResource extends RestResource implements FeedsService {
     }
 
     @Override
-    public void subUserOtherDomain(String user, String userSub) {
-        fromJavaResult(impl.subUserOtherDomain(user, userSub));
-    }
-
-    @Override
     public void unsubscribeUser(String user, String userSub, String pwd) {
         fromJavaResult(impl.unsubscribeUser(user, userSub, pwd));
     }
 
     @Override
-    public void unsubUserOtherDomain(String user, String userSub) {
-        fromJavaResult(impl.unsubUserOtherDomain(user, userSub));
+    public List<String> listSubs(String user) {
+        return fromJavaResult(impl.listSubs(user));
+    }
+
+    // Internal methods
+
+    @Override
+    public long postMessageOtherDomain(String user, String secret, Message msg) {
+        return fromJavaResult(impl.postMessageOtherDomain(user, secret, msg));
     }
 
     @Override
-    public List<String> listSubs(String user) {
-        return fromJavaResult(impl.listSubs(user));
+    public void subUserOtherDomain(String user, String userSub, String secret) {
+        fromJavaResult(impl.subUserOtherDomain(user, userSub, secret));
+    }
+
+    @Override
+    public void unsubUserOtherDomain(String user, String userSub, String secret) {
+        fromJavaResult(impl.unsubUserOtherDomain(user, userSub, secret));
     }
 }

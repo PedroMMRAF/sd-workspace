@@ -23,11 +23,6 @@ public class ProxyFeedsResource extends RestResource implements FeedsService {
     }
 
     @Override
-    public long postMessageOtherDomain(String user, Message msg) {
-        return fromJavaResult(impl.postMessageOtherDomain(user, msg));
-    }
-
-    @Override
     public void removeFromPersonalFeed(String user, long mid, String pwd) {
         fromJavaResult(impl.removeFromPersonalFeed(user, mid, pwd));
     }
@@ -48,22 +43,29 @@ public class ProxyFeedsResource extends RestResource implements FeedsService {
     }
 
     @Override
-    public void subUserOtherDomain(String user, String userSub) {
-        fromJavaResult(impl.subUserOtherDomain(user, userSub));
-    }
-
-    @Override
     public void unsubscribeUser(String user, String userSub, String pwd) {
         fromJavaResult(impl.unsubscribeUser(user, userSub, pwd));
     }
 
     @Override
-    public void unsubUserOtherDomain(String user, String userSub) {
-        fromJavaResult(impl.unsubUserOtherDomain(user, userSub));
+    public List<String> listSubs(String user) {
+        return fromJavaResult(impl.listSubs(user));
+    }
+
+    // Internal methods (not used on proxy)
+
+    @Override
+    public long postMessageOtherDomain(String user, String secret, Message msg) {
+        return fromJavaResult(impl.postMessageOtherDomain(user, secret, msg));
     }
 
     @Override
-    public List<String> listSubs(String user) {
-        return fromJavaResult(impl.listSubs(user));
+    public void subUserOtherDomain(String user, String userSub, String secret) {
+        fromJavaResult(impl.subUserOtherDomain(user, userSub, secret));
+    }
+
+    @Override
+    public void unsubUserOtherDomain(String user, String userSub, String secret) {
+        fromJavaResult(impl.unsubUserOtherDomain(user, userSub, secret));
     }
 }

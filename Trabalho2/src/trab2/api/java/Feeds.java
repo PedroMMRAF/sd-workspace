@@ -10,10 +10,6 @@ public interface Feeds {
 
     Result<Long> postMessage(String user, String pwd, Message msg);
 
-    Result<Long> postMessagePropagate(String user, Message msg);
-
-    Result<Long> postMessageOtherDomain(String user, Message msg);
-
     Result<Void> removeFromPersonalFeed(String user, long mid, String pwd);
 
     Result<Message> getMessage(String user, long mid);
@@ -22,17 +18,25 @@ public interface Feeds {
 
     Result<Void> subUser(String user, String userSub, String pwd);
 
-    Result<Void> subUserPropagate(String user, String userSub);
-
-    Result<Void> subUserOtherDomain(String user, String userSub);
-
     Result<Void> unsubscribeUser(String user, String userSub, String pwd);
 
-    Result<Void> unsubUserPropagate(String user, String userSub);
-
-    Result<Void> unsubUserOtherDomain(String user, String userSub);
-
     Result<List<String>> listSubs(String user);
+
+    // Internal methods
+
+    Result<Long> postMessageOtherDomain(String user, String secret, Message msg);
+
+    Result<Void> subUserOtherDomain(String user, String userSub, String secret);
+
+    Result<Void> unsubUserOtherDomain(String user, String userSub, String secret);
+
+    // Propagate methods
+
+    Result<Long> postMessagePropagate(String user, Message msg);
+
+    Result<Void> subUserPropagate(String user, String userSub);
+
+    Result<Void> unsubUserPropagate(String user, String userSub);
 
     // Auxiliary methods
 

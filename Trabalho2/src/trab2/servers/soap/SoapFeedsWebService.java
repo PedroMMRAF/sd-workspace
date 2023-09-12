@@ -16,19 +16,14 @@ public class SoapFeedsWebService extends SoapWebService<FeedsException> implemen
 
     final Feeds impl;
 
-    public SoapFeedsWebService(int initialSequence) {
+    public SoapFeedsWebService() {
         super((result) -> new FeedsException(result.error().toString()));
-        this.impl = new JavaFeeds(initialSequence);
+        this.impl = new JavaFeeds();
     }
 
     @Override
     public long postMessage(String user, String pwd, Message msg) throws FeedsException {
         return fromJavaResult(impl.postMessage(user, pwd, msg));
-    }
-
-    @Override
-    public long postMessageOtherDomain(String user, Message msg) throws FeedsException {
-        return fromJavaResult(impl.postMessageOtherDomain(user, msg));
     }
 
     @Override
@@ -52,18 +47,8 @@ public class SoapFeedsWebService extends SoapWebService<FeedsException> implemen
     }
 
     @Override
-    public void subUserOtherDomain(String user, String userSub) throws FeedsException {
-        fromJavaResult(impl.subUserOtherDomain(user, userSub));
-    }
-
-    @Override
     public void unsubscribeUser(String user, String userSub, String pwd) throws FeedsException {
         fromJavaResult(impl.unsubscribeUser(user, userSub, pwd));
-    }
-
-    @Override
-    public void unsubUserOtherDomain(String user, String userSub) throws FeedsException {
-        fromJavaResult(impl.unsubUserOtherDomain(user, userSub));
     }
 
     @Override
@@ -71,4 +56,20 @@ public class SoapFeedsWebService extends SoapWebService<FeedsException> implemen
         return fromJavaResult(impl.listSubs(user));
     }
 
+    // Internal methods
+
+    @Override
+    public long postMessageOtherDomain(String user, String secret, Message msg) throws FeedsException {
+        return fromJavaResult(impl.postMessageOtherDomain(user, secret, msg));
+    }
+
+    @Override
+    public void subUserOtherDomain(String user, String userSub, String secret) throws FeedsException {
+        fromJavaResult(impl.subUserOtherDomain(user, userSub, secret));
+    }
+
+    @Override
+    public void unsubUserOtherDomain(String user, String userSub, String secret) throws FeedsException {
+        fromJavaResult(impl.unsubUserOtherDomain(user, userSub, secret));
+    }
 }

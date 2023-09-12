@@ -25,7 +25,7 @@ public record PostStatusResult(String id, String content, String created_at, Mas
     }
 
     public Message toMessage() {
-        var m = new Message(getId(), account.username(), Domain.get(), getText());
+        var m = new Message(getId(), account.username(), Domain.domain(), getText());
         m.setCreationTime(getCreationTime());
         return m;
     }
